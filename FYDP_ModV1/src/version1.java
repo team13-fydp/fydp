@@ -13,8 +13,8 @@ public class version1 {
 		int n = 9;
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Away", "Prep"};
 		int subjects = 7;
-		int prepSubject = n;
-		int awaySubject = (n-1);
+		int prepSubject = n-1;
+		int awaySubject = n-2;
 		
 	//define parameters - teachers
 		int n2 = 17;
@@ -27,16 +27,33 @@ public class version1 {
 		int primaryUb = 3;
 		int frenchCohortlb = 3;
 		int frenchCohortub = 11;
-		int frenchNum = frenchCohortub - frenchCohortlb;
+		int frenchNum = 8;
 		//int classUb = n3-2;
-		int prepCohort = n3;
-		int awayCohort = n3-1;
+		int prepCohort = n3-1;
+		int awayCohort = n3-2;
 		
 		int cohortRange = 12;
 		int subjectRange = 8;
 		
 	//define parameters - time
 		int n4 = 30;
+		
+	//period ranges for each day
+		int day1s = 0;
+		int day1f = 6;
+				
+		int day2s = 6;
+		int day2f = 12;
+				
+		int day3s = 12;
+		int day3f = 18;
+				
+		int day4s = 18;
+		int day4f = 24;
+				
+		int day5s = 24;
+		int day5f = 30;	
+		
 		int basePrepTime = 240;
 		double totalTime = 1500;
 		
@@ -46,7 +63,7 @@ public class version1 {
 		double [] teachMin = new double [n2];
 		
 	//fill above arrays
-		for (int j = 0; j<=n2-1;j++) {
+		for (int j = 0; j<n2;j++) {
 			totalTeacherMin[j] = FTE[j]*totalTime;
 			prep[j] = FTE[j]*basePrepTime; //prep time allocation
 			teachMin[j] = totalTeacherMin[j]-prep[j]; //teaching minute allocation
@@ -57,7 +74,7 @@ public class version1 {
 		//fill availableTime matrix
 		
 		//first nine rows are 1
-		for(int a = 0; a<=8;a++) {
+		for(int a = 0; a<=3;a++) {
 			for(int b=0;b<=29;b++) {
 				availableTime[a][b]=1;
 			}
@@ -65,12 +82,38 @@ public class version1 {
 		
 		//last 9 entries of 10th row are 0
 		for(int c=0;c<=20;c++) {
-			availableTime[8][c]=1;
+			availableTime[4][c]=1;
 		}
 		
-		//last row is all 1's
-		for(int d=0;d<=29;d++) {
-			availableTime[10][d]=1;
+		for(int a = 5; a<=10;a++) {
+			for(int b=0;b<=29;b++) {
+				availableTime[a][b]=1;
+			}
+		}
+		
+		for(int c=24;c<=29;c++) {
+			availableTime[11][c]=1;
+		}
+		
+		for(int c = 18; c<=23;c++) {
+			availableTime[12][c] = 1;
+		}
+		
+		for(int c = 0; c<=8;c++) {
+			availableTime[13][c] = 1; 
+		}
+		for(int c = 21; c<=29;c++) {
+			availableTime[13][c] = 1; 
+		}
+		
+		for(int c = 0; c<=5;c++) {
+			availableTime[14][c] = 1; 
+		}
+		for(int c = 0; c<=8;c++) {
+			availableTime[15][c] = 1; 
+		}
+		for(int c = 0; c<=29;c++) {
+			availableTime[16][c] = 1; 
 		}
 				
 	//time periods array
@@ -147,22 +190,6 @@ public class version1 {
 		//Number of Primary Classes
 		int primary = 3;
 		int blockCount = 15;
-		
-		//period ranges for each day
-		int day1s = 0;
-		int day1f = 6;
-		
-		int day2s = 6;
-		int day2f = 12;
-		
-		int day3s = 12;
-		int day3f = 18;
-		
-		int day4s = 18;
-		int day4f = 24;
-		
-		int day5s = 24;
-		int day5f = 30;
 		
 		try {
 			//define the model
@@ -433,11 +460,11 @@ for(int k=0;k<primaryUb;k++) {
 //constraint 9, language for french applicable cohort
 IloLinearNumExpr[] lang6 = new IloLinearNumExpr[frenchNum];
 
-for(int k=frenchCohortlb;k<frenchCohortub;k++){
+for(int k=0;k<frenchNum;k++){
 	lang6[k] = cplex.linearNumExpr();
 	for(int j=0;j<n2;j++) {
 		for(int t =0;t<n4;t++) {
-			lang6[k].addTerm(lengtht[t], x[1][j][k][t]);
+			lang6[k].addTerm(lengtht[t], x[1][j][k+frenchCohortlb][t]);
 			}
 		}
 	}
@@ -519,7 +546,7 @@ for(int k =0; k<frenchNum;k++){
 	french2[k] = cplex.linearNumExpr();
 	for(int j=0;j<frenchNum; j++){
 		for(int t=0;t<n4;t++){
-			french2[k].addTerm(lengtht[t], x[6][j][k][t]);
+			french2[k].addTerm(lengtht[t], x[6][j][k+frenchCohortlb][t]);
 			}
 		}
 	}
@@ -590,31 +617,32 @@ for(int j=0;j<n2;j++){
 	prep3[j] = cplex.linearNumExpr();
 	prep4[j] = cplex.linearNumExpr();
 	prep5[j] = cplex.linearNumExpr();
-	for(int a1 =1;a1<=6;a1++) {
-		prep1[j].addTerm(1, x[1][j][prepCohort][a1]);
-		prep1[j].addTerm(1, u[j][1]);
-		prep1[j].addTerm(-1, v[j][1]);
+	
+	for(int a1 =day1s;a1<day1f;a1++) {
+		prep1[j].addTerm(1, x[prepSubject][j][prepCohort][a1]);
+		prep1[j].addTerm(1, u[j][0]);
+		prep1[j].addTerm(-1, v[j][0]);
 		
    }
-	for(int b1=7; b1<=12;b1++){
-		prep2[j].addTerm(lengtht[b1], x[1][j][prepCohort][b1]);
-		prep2[j].addTerm(1, u[j][2]);
-		prep2[j].addTerm(-1, v[j][2]);
+	for(int b1=day2s; b1<day2f;b1++){
+		prep2[j].addTerm(lengtht[b1], x[prepSubject][j][prepCohort][b1]);
+		prep2[j].addTerm(1, u[j][1]);
+		prep2[j].addTerm(-1, v[j][1]);
 		}
-	for(int c=13; c<=18;c++){
-		prep3[j].addTerm(lengtht[c], x[1][j][prepCohort][c]);
-		prep3[j].addTerm(1, u[j][3]);
-		prep3[j].addTerm(-1, v[j][3]);
+	for(int c=day3s; c<day3f;c++){
+		prep3[j].addTerm(lengtht[c], x[prepSubject][j][prepCohort][c]);
+		prep3[j].addTerm(1, u[j][2]);
+		prep3[j].addTerm(-1, v[j][2]);
 	}
-	for(int d = 19; d<=24;d++){
-		prep4[j].addTerm(lengtht[d], x[1][j][prepCohort][d]);
-		prep4[j].addTerm(1, u[j][4]);
-		prep4[j].addTerm(-1, v[j][4]);
+	for(int d =day4s; d<day4f;d++){
+		prep4[j].addTerm(lengtht[d], x[prepSubject][j][prepCohort][d]);
+		prep4[j].addTerm(1, u[j][3]);
+		prep4[j].addTerm(-1, v[j][3]);
 	}
-	for(int e=25; e<=30; e++){
-		prep5[j].addTerm(lengtht[e], x[1][j][prepCohort][e]);
-		prep5[j].addTerm(1, u[j][5]);
-		prep5[j].addTerm(-1, v[j][5]);	
+	for(int e=day5s; e<day5f; e++){
+		prep5[j].addTerm(lengtht[e], x[prepSubject][j][prepCohort][e]);
+		prep5[j].addTerm(1, u[j][4]);
+		prep5[j].addTerm(-1, v[j][4]);	
 	}
 }
 
@@ -626,37 +654,58 @@ for(int j=0;j<n2;j++){
 	cplex.addEq(prep5[j], 1);	
 }
 
-//constraint 19, language for primary has to be back to back
-//NOT VARIABLE****
-IloLinearNumExpr [][] prilan1 = new IloLinearNumExpr[5][3];
-IloLinearNumExpr [][] prilan2 = new IloLinearNumExpr[5][3];
-IloLinearNumExpr [][] prilan3 = new IloLinearNumExpr[5][3];
+//slack and surplus variables
+IloLinearNumExpr [][] slack = new IloLinearNumExpr [n2][numDays];
+IloLinearNumExpr [][] surplus = new IloLinearNumExpr [n2][numDays];
 
-for(int d=0; d<5;d++) {
-	for(int k=0;k<3;k++) {
+for(int j = 0; j<n2; j++) {
+	for(int d = 0; d<numDays;d++) {
+		slack[j][d] = cplex.linearNumExpr();
+		surplus[j][d] = cplex.linearNumExpr();
+		
+		slack[j][d].addTerm(1, u[j][d]);
+		surplus[j][d].addTerm(1, v[j][d]);
+	}
+}
+
+for(int j = 0; j<n2; j++) {
+	for(int d = 0; d<numDays;d++) {
+		cplex.addGe(slack[j][d], 0);
+		cplex.addGe(surplus[j][d], 0);
+	}
+}
+
+
+//constraint 19, language for primary has to be back to back
+IloLinearNumExpr [][] prilan1 = new IloLinearNumExpr[numDays][primary];
+IloLinearNumExpr [][] prilan2 = new IloLinearNumExpr[numDays][primary];
+IloLinearNumExpr [][] prilan3 = new IloLinearNumExpr[numDays][primary];
+
+for(int d=0; d<numDays;d++) {
+	for(int k=0;k<primary;k++) {
 		prilan1[d][k] = cplex.linearNumExpr();
 		prilan2[d][k] = cplex.linearNumExpr();
 		prilan3[d][k] = cplex.linearNumExpr();
 		
 		for(int j=0;j<n2;j++) {
-			prilan1[d][k].addTerm(1,x[2][j][k][1+(d-1)*6]);
-			prilan1[d][k].addTerm(1, x[2][j][k][2+(d-1)*6]);
+			prilan1[d][k].addTerm(1,x[1][j][k][(d*6)]);
+			prilan1[d][k].addTerm(1, x[1][j][k][1+(d*6)]);
 			
-			prilan2[d][k].addTerm(1, x[2][j][k][3+(d-1)*6]);
-			prilan2[d][k].addTerm(1, x[2][j][k][4+(d-1)*6]);
+			prilan2[d][k].addTerm(1, x[1][j][k][2+(d*6)]);
+			prilan2[d][k].addTerm(1, x[1][j][k][3+(d*6)]);
 			
-			prilan3[d][k].addTerm(1, x[2][j][k][5+(d-1)*6]);
-			prilan3[d][k].addTerm(1,x[2][j][k][6+(d-1)*6]);
+			prilan3[d][k].addTerm(1, x[1][j][k][4+(d*6)]);
+			prilan3[d][k].addTerm(1,x[1][j][k][5+(d*6)]);
 			
 		}
 	}
 }
 
-for(int d=0;d<5;d++) {
-	for(int k=0;k<3;k++) {
-		cplex.addEq(prilan1[d][k], cplex.prod(2, a[k][1+3*(d-1)]));
-		cplex.addEq(prilan2[d][k], cplex.prod(2, a[k][2+3*(d-1)]));
-		cplex.addEq(prilan3[d][k], cplex.prod(2, a[k][3+3*(d-1)]));
+for(int d=0;d<numDays;d++) {
+	for(int k=0;k<primary;k++) {
+		cplex.addEq(prilan1[d][k], cplex.prod(2, a[k][3*d]));
+		cplex.addEq(prilan2[d][k], cplex.prod(2, a[k][1+(3*d)]));
+		cplex.addEq(prilan3[d][k], cplex.prod(2, a[k][2+(3*d)]));
 		
 	}
 }
