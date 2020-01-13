@@ -19,7 +19,9 @@ public class version1 {
 	//define parameters - teachers
 		int n2 = 17;
 		double [] FTE = {1.0,1.0,1.0,1.0,0.7,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,0.3,1.0};
-		int frenchInd = n2-1;
+		int frenchTeachlb = 15;
+		int frenchTeachub = 16;
+		int frenchTeach = 2;
 	
 	//define parameters - cohorts
 		int n3 = 13;
@@ -80,7 +82,6 @@ public class version1 {
 			}
 		}
 		
-		//last 9 entries of 10th row are 0
 		for(int c=0;c<=20;c++) {
 			availableTime[4][c]=1;
 		}
@@ -204,7 +205,7 @@ public class version1 {
 					for(int k=0;k<n3;k++) {
 						for(int t=0;t<n4;t++) {
 							String varName = "x" + i+j+k+t; 
-							x[i][j][k][t] =cplex.intVar(0,1, varName);
+							x[i][j][k][t] =cplex.boolVar(varName);
 						}
 					}
 				}				
@@ -236,7 +237,7 @@ public class version1 {
 			for(int i = 0; i<primary;i++) {
 				for(int j = 0;j<blockCount;j++) {
 					String varName = "a"+i+j;
-					a[i][j] = cplex.intVar(0,1, varName);
+					a[i][j] = cplex.boolVar(varName);
 				}
 			}
 		
@@ -255,16 +256,10 @@ public class version1 {
 			for(int j=0;j<n2;j++) {
 				for(int d=0;d<numDays;d++) {
 					objective.addTerm(-pjd, u[j][d]);
-				}
-			}
-			
-			for(int j=0;j<n2;j++) {
-				for(int d=0;d<numDays;d++) {
-					objective.addTerm(pjd, v[j][d]);
+					objective.addTerm(-pjd, v[j][d]);
 				}
 			}
 						
-			
 			cplex.addMaximize(objective);
 			
 //define constraints
@@ -299,7 +294,7 @@ IloLinearNumExpr[][] constr3 = new IloLinearNumExpr[n2][n4];
 for(int j=0; j<n2;j++) {
 	for(int t=0; t<n4;t++) {
 		constr2[j][t] = cplex.linearNumExpr();
-		constr3[j][t] = cplex.linearNumExpr();
+		
 		
 		for(int i=0; i<n;i++) {
 			for(int k=0; k<n3;k++) {
@@ -307,19 +302,35 @@ for(int j=0; j<n2;j++) {
 			}
 		}
 		
+		
+	}
+}
+
+for(int j=0; j<n2;j++) {
+	for(int t=0;t<n4;t++) {
+		constr3[j][t] = cplex.linearNumExpr();
+		
 		for(int i=0; i<subjects;i++) {
 			for(int k=0; k<teachingCohort; k++) {
 				constr3[j][t].addTerm(1, x[i][j][k][t]);
 			}
 		}
 		 constr3[j][t].addTerm(1,x[subjectRange][j][cohortRange][t]);
+		
+	}
+}
+
+for(int j=0; j<n2;j++) {
+	for(int t=0;t<n4;t++) {
+		cplex.addEq(constr2[j][t], 1);
+	
 	}
 }
 
 
 for(int j=0; j<n2;j++) {
 	for(int t=0;t<n4;t++) {
-		cplex.addEq(constr2[j][t], 1);
+	
 		cplex.addEq(constr3[j][t],availableTime[j][t]);
 	}
 }
@@ -330,7 +341,7 @@ IloLinearNumExpr[][] constr4 = new IloLinearNumExpr[teachingCohort][n4];
 for(int k=0;k<teachingCohort;k++) {
 	for(int t = 0; t<n4;t++) {
 		constr4[k][t] = cplex.linearNumExpr();
-		for(int i=0;i<n-2;i++) {
+		for(int i=0;i<subjects;i++) {
 			for(int j=0;j<n2;j++) {
 				constr4[k][t].addTerm(1, x[i][j][k][t]);
 			}
@@ -350,7 +361,7 @@ IloLinearNumExpr[] assign3 = new IloLinearNumExpr[teachingCohort];
 
 for(int k=0;k<teachingCohort;k++) {
 	assign3[k] = cplex.linearNumExpr();
-	for(int i=0;i<n-2;i++) {
+	for(int i=0;i<subjects;i++) {
 		for(int j=0;j<n2;j++) {
 			for(int t=0;t<n4;t++) {
 				assign3[k].addTerm(1, x[i][j][k][t]);				
@@ -478,20 +489,24 @@ for(int k = 0; k<frenchNum;k++){
 	}
 
 //constraint 10, science 
-IloLinearNumExpr[] sci = new IloLinearNumExpr[teachingCohort];
+IloLinearNumExpr[] sci1 = new IloLinearNumExpr[teachingCohort];
+IloLinearNumExpr[] sci2 = new IloLinearNumExpr[teachingCohort];
 
 for(int k = 0; k<teachingCohort; k++){
-	sci[k] = cplex.linearNumExpr();
+	sci1[k] = cplex.linearNumExpr();
+	sci2[k] = cplex.linearNumExpr();
 	for(int j = 0; j<n2;j++){
 		for(int t = 0; t<n4;t++){
-			sci[k].addTerm(lengtht[t], x[2][j][k][t]);
+			sci1[k].addTerm(lengtht[t], x[2][j][k][t]);
+			sci2[k].addTerm(lengtht[t], x[2][j][k][t]);
+
 			}
 		}
 	}
 
 for(int k = 0; k<teachingCohort;k++){
-	cplex.addGe(sci[k], 100);
-	cplex.addLe(sci[k], 150);
+	cplex.addGe(sci1[k], 100);
+	cplex.addLe(sci2[k], 150);
 	}
 
 //constraint 11, art
@@ -527,20 +542,23 @@ for(int k = 0;k<teachingCohort;k++){
 	}
 
 //constraint 13, phys-ed
-IloLinearNumExpr [] phys = new IloLinearNumExpr[teachingCohort];
+IloLinearNumExpr [] phys1 = new IloLinearNumExpr[teachingCohort];
+IloLinearNumExpr [] phys2 = new IloLinearNumExpr[teachingCohort];
 
 for(int k=0;k<teachingCohort;k++){
-	phys[k] = cplex.linearNumExpr();
+	phys1[k] = cplex.linearNumExpr();
+	phys2[k] = cplex.linearNumExpr();
 	for(int j=0;j<n2;j++){
 		for(int t=0;t<n4;t++){
-			phys[k].addTerm(lengtht[t], x[5][j][k][t]);
+			phys1[k].addTerm(lengtht[t], x[5][j][k][t]);
+			phys2[k].addTerm(lengtht[t], x[5][j][k][t]);
 			}
 		}
 	}
 
 for(int k=0;k<teachingCohort;k++){
-	cplex.addGe(phys[k], 150);
-	cplex.addLe(phys[k],300);
+	cplex.addGe(phys1[k], 150);
+	cplex.addLe(phys2[k],200);
 	}
 
 //constraint 14, french for applicable classes
@@ -548,9 +566,9 @@ IloLinearNumExpr [] french2 = new IloLinearNumExpr[frenchNum];
 
 for(int k =0; k<frenchNum;k++){
 	french2[k] = cplex.linearNumExpr();
-	for(int j=0;j<frenchNum; j++){
+	for(int j=0;j<frenchTeach; j++){
 		for(int t=0;t<n4;t++){
-			french2[k].addTerm(lengtht[t], x[6][j][k+frenchCohortlb][t]);
+			french2[k].addTerm(lengtht[t], x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		}
 	}
@@ -579,8 +597,8 @@ IloLinearNumExpr [] teach = new IloLinearNumExpr[n2];
 
 for(int j=0;j<n2;j++){
 	teach[j] = cplex.linearNumExpr();
-	for(int t=0;t<n2;t++){
-		for(int i=0;i<n;i++){
+	for(int t=0;t<n4;t++){
+		for(int i=0;i<subjects;i++){
 			for(int k=0;k<teachingCohort;k++){
 				teach[j].addTerm(lengtht[t], x[i][j][k][t]);
 				}
@@ -630,25 +648,25 @@ for(int j=0;j<n2;j++){
 	prep1[j].addTerm(-1, v[j][0]);
 	
 	for(int b1=day2s; b1<day2f;b1++){
-		prep2[j].addTerm(lengtht[b1], x[prepSubject][j][prepCohort][b1]);
+		prep2[j].addTerm(1, x[prepSubject][j][prepCohort][b1]);
 		}
 	prep2[j].addTerm(1, u[j][1]);
 	prep2[j].addTerm(-1, v[j][1]);
 	
 	for(int c=day3s; c<day3f;c++){
-		prep3[j].addTerm(lengtht[c], x[prepSubject][j][prepCohort][c]);
+		prep3[j].addTerm(1, x[prepSubject][j][prepCohort][c]);
 	}
 	prep3[j].addTerm(1, u[j][2]);
 	prep3[j].addTerm(-1, v[j][2]);
 	
 	for(int d =day4s; d<day4f;d++){
-		prep4[j].addTerm(lengtht[d], x[prepSubject][j][prepCohort][d]);
+		prep4[j].addTerm(1, x[prepSubject][j][prepCohort][d]);
 	}
 	prep4[j].addTerm(1, u[j][3]);
 	prep4[j].addTerm(-1, v[j][3]);
 	
 	for(int e=day5s; e<day5f; e++){
-		prep5[j].addTerm(lengtht[e], x[prepSubject][j][prepCohort][e]);	
+		prep5[j].addTerm(1, x[prepSubject][j][prepCohort][e]);	
 	}
 	prep5[j].addTerm(1, u[j][4]);
 	prep5[j].addTerm(-1, v[j][4]);
@@ -717,9 +735,10 @@ for(int d=0;d<numDays;d++) {
 		
 	}
 }
-
+cplex.exportModel("lpex1.lp");
 //solve 
 if(cplex.solve()) {
+
 	System.out.println("Objective = "+cplex.getObjValue());
 	System.out.println("Teacher, Cohort, Subject, Period, Day");
 	
@@ -730,7 +749,7 @@ if(cplex.solve()) {
 }
 else {
 	System.out.println("Model not solved");
-	cplex.exportModel("lpex1.lp");
+	//cplex.exportModel("lpex1.lp");
 }
 
 
