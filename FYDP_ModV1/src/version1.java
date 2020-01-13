@@ -203,7 +203,8 @@ public class version1 {
 				for(int j=0;j<n2;j++){
 					for(int k=0;k<n3;k++) {
 						for(int t=0;t<n4;t++) {
-							x[i][j][k][t] =cplex.intVar(0,1);
+							String varName = "x" + i+j+k+t; 
+							x[i][j][k][t] =cplex.intVar(0,1, varName);
 						}
 					}
 				}				
@@ -214,7 +215,8 @@ public class version1 {
 			
 			for(int a=0;a<n2;a++) {
 				for(int b=0;b<numDays;b++) {
-					u[a][b] = cplex.intVar(0, Integer.MAX_VALUE);
+					String varName = "u" + a+b;
+					u[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
 			}
 			
@@ -223,7 +225,8 @@ public class version1 {
 			
 			for(int a = 0; a<n2;a++) {
 				for(int b = 0;b<numDays; b++) {
-					v[a][b] = cplex.intVar(0, Integer.MAX_VALUE);
+					String varName = "v"+a+b;
+					v[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
 			}
 			
@@ -232,7 +235,8 @@ public class version1 {
 			
 			for(int i = 0; i<primary;i++) {
 				for(int j = 0;j<blockCount;j++) {
-					a[i][j] = cplex.intVar(0,1);
+					String varName = "a"+i+j;
+					a[i][j] = cplex.intVar(0,1, varName);
 				}
 			}
 		
@@ -437,7 +441,7 @@ for(int k=0;k<primaryUb;k++) {
 		for(int b1= day2s; b1<day2f;b1++){
 			lang2[k].addTerm(lengtht[b1], x[1][j][k][b1]);
 			}
-		for(int c=day1s; c<day3f;c++){
+		for(int c=day3s; c<day3f;c++){
 			lang3[k].addTerm(lengtht[c], x[1][j][k][c]);
 			}
 		for(int d = day4s; d<day4f;d++){
@@ -620,30 +624,34 @@ for(int j=0;j<n2;j++){
 	
 	for(int a1 =day1s;a1<day1f;a1++) {
 		prep1[j].addTerm(1, x[prepSubject][j][prepCohort][a1]);
-		prep1[j].addTerm(1, u[j][0]);
-		prep1[j].addTerm(-1, v[j][0]);
 		
    }
+	prep1[j].addTerm(1, u[j][0]);
+	prep1[j].addTerm(-1, v[j][0]);
+	
 	for(int b1=day2s; b1<day2f;b1++){
 		prep2[j].addTerm(lengtht[b1], x[prepSubject][j][prepCohort][b1]);
-		prep2[j].addTerm(1, u[j][1]);
-		prep2[j].addTerm(-1, v[j][1]);
 		}
+	prep2[j].addTerm(1, u[j][1]);
+	prep2[j].addTerm(-1, v[j][1]);
+	
 	for(int c=day3s; c<day3f;c++){
 		prep3[j].addTerm(lengtht[c], x[prepSubject][j][prepCohort][c]);
-		prep3[j].addTerm(1, u[j][2]);
-		prep3[j].addTerm(-1, v[j][2]);
 	}
+	prep3[j].addTerm(1, u[j][2]);
+	prep3[j].addTerm(-1, v[j][2]);
+	
 	for(int d =day4s; d<day4f;d++){
 		prep4[j].addTerm(lengtht[d], x[prepSubject][j][prepCohort][d]);
-		prep4[j].addTerm(1, u[j][3]);
-		prep4[j].addTerm(-1, v[j][3]);
 	}
+	prep4[j].addTerm(1, u[j][3]);
+	prep4[j].addTerm(-1, v[j][3]);
+	
 	for(int e=day5s; e<day5f; e++){
-		prep5[j].addTerm(lengtht[e], x[prepSubject][j][prepCohort][e]);
-		prep5[j].addTerm(1, u[j][4]);
-		prep5[j].addTerm(-1, v[j][4]);	
+		prep5[j].addTerm(lengtht[e], x[prepSubject][j][prepCohort][e]);	
 	}
+	prep5[j].addTerm(1, u[j][4]);
+	prep5[j].addTerm(-1, v[j][4]);
 }
 
 for(int j=0;j<n2;j++){
@@ -722,6 +730,7 @@ if(cplex.solve()) {
 }
 else {
 	System.out.println("Model not solved");
+	cplex.exportModel("lpex1.lp");
 }
 
 
