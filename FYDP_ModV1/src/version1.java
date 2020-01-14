@@ -747,27 +747,60 @@ if(cplex.solve()) {
 		
 	int math = 0;
 	int lan = 0;
+	int art1 = 0;
+	int soc1 = 0;
+	int sci = 0;
+	int gym = 0;
+	int french3 = 0;
+	int totalMin = 0;
+	
+	
 	for(int t =0; t<n4;t++) {
 		for(int i =0;i<n;i++) {
 			for(int j =0; j<n2;j++) {
 				for(int k=0;k<n3;k++) {
 					if((cplex.getValue(x[i][j][k][t])) >0.5) {
 						System.out.println("Teacher: "+ j +" Cohort: " + k + " Subject: " + subj[i] +" Time: "+ t);
-						if(i==0 && k==2) {
+						if(i==0 && k==8) {
 							
 							math = math + lengtht[t];
 						}
-						if(i==1 && k==2) {
+						if(i==1 && k==8) {
 							lan = lan+ lengtht[t];
 						}
+						if(i==2 && k==8) {
+							sci = sci+lengtht[t];
+						}
+						if(i==3 && k==8) {
+							art1 = art1 + lengtht[t];
+						}
+						if(i==4 && k==8) {
+							soc1 = soc1 + lengtht[t];
+						}
+						if(i==5 && k==8) {
+							gym = gym+lengtht[t];
+						}
+						if(i==6 && k==8) {
+							french3 = french3 + lengtht[t];
+						}
+						
 					}
 				}
 			}
 		}
 		
 	}
+	totalMin = math+lan+sci+art1+soc1+gym+french3;
+	
 	System.out.println(math);
 	System.out.println(lan);
+	System.out.println(sci);
+	System.out.println(art1);
+	System.out.println(soc1);
+	System.out.println(gym);
+	System.out.println(french3);
+	System.out.println(totalMin);
+	
 	
 }
 else {
@@ -775,10 +808,7 @@ else {
 	cplex.exportModel("lpex1.lp");
 }
 
-
-
 }
-	
 	
 		catch (IloException exc) {
 			exc.printStackTrace();
