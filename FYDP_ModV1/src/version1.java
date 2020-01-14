@@ -167,6 +167,8 @@ public class version1 {
 						rewards[k][j][i] = 10;
 					}else if((k>=3 && k<=10) && j==13 && i==3) {
 						rewards[k][j][i] = 200;
+					}else if((k>=3 && k<=10) && j==13 && i==3) {
+						rewards[k][j][i]=200;
 					}else if((k>=3 && k<=6) && j==14 && i==4) {
 						rewards[k][j][i] = 200;
 					}else if((k>=3 && k<=6) && j== 14 && i==3) {
@@ -199,7 +201,7 @@ public class version1 {
 			//variables
 			
 			//x is the binary location variable
-			IloIntVar [][][][] x = new IloIntVar[n][n2][n3][n4];
+			IloNumVar [][][][] x = new IloNumVar[n][n2][n3][n4];
 			for(int i = 0;i<n;i++) {
 				for(int j=0;j<n2;j++){
 					for(int k=0;k<n3;k++) {
@@ -432,11 +434,11 @@ for(int k=0;k<teachingCohort;k++) {
 }
 
 //constraint 8, language for primary cohorts
-IloLinearNumExpr[] lang1 = new IloLinearNumExpr[primaryUb];
-IloLinearNumExpr[] lang2 = new IloLinearNumExpr[primaryUb];
-IloLinearNumExpr[] lang3 = new IloLinearNumExpr[primaryUb];
-IloLinearNumExpr[] lang4 = new IloLinearNumExpr[primaryUb];
-IloLinearNumExpr[] lang5 = new IloLinearNumExpr[primaryUb];
+IloLinearNumExpr[] lang1 = new IloLinearNumExpr[primary];
+IloLinearNumExpr[] lang2 = new IloLinearNumExpr[primary];
+IloLinearNumExpr[] lang3 = new IloLinearNumExpr[primary];
+IloLinearNumExpr[] lang4 = new IloLinearNumExpr[primary];
+IloLinearNumExpr[] lang5 = new IloLinearNumExpr[primary];
 
 for(int k=0;k<primaryUb;k++) {
 	lang1[k] = cplex.linearNumExpr();
@@ -490,15 +492,15 @@ for(int k = 0; k<frenchNum;k++){
 
 //constraint 10, science 
 IloLinearNumExpr[] sci1 = new IloLinearNumExpr[teachingCohort];
-IloLinearNumExpr[] sci2 = new IloLinearNumExpr[teachingCohort];
+//IloLinearNumExpr[] sci2 = new IloLinearNumExpr[teachingCohort];
 
 for(int k = 0; k<teachingCohort; k++){
 	sci1[k] = cplex.linearNumExpr();
-	sci2[k] = cplex.linearNumExpr();
+	//sci2[k] = cplex.linearNumExpr();
 	for(int j = 0; j<n2;j++){
 		for(int t = 0; t<n4;t++){
 			sci1[k].addTerm(lengtht[t], x[2][j][k][t]);
-			sci2[k].addTerm(lengtht[t], x[2][j][k][t]);
+			//sci2[k].addTerm(lengtht[t], x[2][j][k][t]);
 
 			}
 		}
@@ -506,7 +508,7 @@ for(int k = 0; k<teachingCohort; k++){
 
 for(int k = 0; k<teachingCohort;k++){
 	cplex.addGe(sci1[k], 100);
-	cplex.addLe(sci2[k], 150);
+	cplex.addLe(sci1[k], 150);
 	}
 
 //constraint 11, art
@@ -543,22 +545,22 @@ for(int k = 0;k<teachingCohort;k++){
 
 //constraint 13, phys-ed
 IloLinearNumExpr [] phys1 = new IloLinearNumExpr[teachingCohort];
-IloLinearNumExpr [] phys2 = new IloLinearNumExpr[teachingCohort];
+//IloLinearNumExpr [] phys2 = new IloLinearNumExpr[teachingCohort];
 
 for(int k=0;k<teachingCohort;k++){
 	phys1[k] = cplex.linearNumExpr();
-	phys2[k] = cplex.linearNumExpr();
+	//phys2[k] = cplex.linearNumExpr();
 	for(int j=0;j<n2;j++){
 		for(int t=0;t<n4;t++){
 			phys1[k].addTerm(lengtht[t], x[5][j][k][t]);
-			phys2[k].addTerm(lengtht[t], x[5][j][k][t]);
+			//phys2[k].addTerm(lengtht[t], x[5][j][k][t]);
 			}
 		}
 	}
 
 for(int k=0;k<teachingCohort;k++){
 	cplex.addGe(phys1[k], 150);
-	cplex.addLe(phys2[k],200);
+	cplex.addLe(phys1[k],200);
 	}
 
 //constraint 14, french for applicable classes
@@ -736,20 +738,41 @@ for(int d=0;d<numDays;d++) {
 	}
 }
 cplex.exportModel("lpex1.lp");
+
 //solve 
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
 	System.out.println("Teacher, Cohort, Subject, Period, Day");
-	
-	for(int i =0; i<n4;i++) {
+		
+	int math = 0;
+	int lan = 0;
+	for(int t =0; t<n4;t++) {
+		for(int i =0;i<n;i++) {
+			for(int j =0; j<n2;j++) {
+				for(int k=0;k<n3;k++) {
+					if((cplex.getValue(x[i][j][k][t])) >0.5) {
+						System.out.println("Teacher: "+ j +" Cohort: " + k + " Subject: " + subj[i] +" Time: "+ t);
+						if(i==0 && k==2) {
+							
+							math = math + lengtht[t];
+						}
+						if(i==1 && k==2) {
+							lan = lan+ lengtht[t];
+						}
+					}
+				}
+			}
+		}
 		
 	}
+	System.out.println(math);
+	System.out.println(lan);
 	
 }
 else {
 	System.out.println("Model not solved");
-	//cplex.exportModel("lpex1.lp");
+	cplex.exportModel("lpex1.lp");
 }
 
 
