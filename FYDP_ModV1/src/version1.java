@@ -792,14 +792,14 @@ if(cplex.solve()) {
 	}
 	totalMin = math+lan+sci+art1+soc1+gym+french3;
 	
-	System.out.println(math);
-	System.out.println(lan);
-	System.out.println(sci);
-	System.out.println(art1);
-	System.out.println(soc1);
-	System.out.println(gym);
-	System.out.println(french3);
-	System.out.println(totalMin);
+	System.out.println("Math" + math);
+	System.out.println("Language" + lan);
+	System.out.println("Science" + sci);
+	System.out.println("Art" + art1);
+	System.out.println("Social Studies" + soc1);
+	System.out.println("Gym" + gym);
+	System.out.println("French" + french3);
+	System.out.println("Total Teaching Minutes" + totalMin);
 	
 	
 }
