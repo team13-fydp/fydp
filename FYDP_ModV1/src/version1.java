@@ -266,7 +266,7 @@ public class version1 {
 			
 //define constraints
 			
-//assignment 1
+//assignment1- only 1 teacher assigned to a cohort and subject at a time-fixed constr
 IloLinearNumExpr[][][] assign1 = new IloLinearNumExpr[subjects][teachingCohort][n4];
 
 for(int i=0;i<subjects;i++) {
@@ -307,7 +307,7 @@ for(int j=0; j<n2;j++) {
 		
 	}
 }
-
+//teacher can only teach one subject/class at a time - if you're assigned to teach, cant be assigned away/prep and vice versa
 for(int j=0; j<n2;j++) {
 	for(int t=0;t<n4;t++) {
 		constr3[j][t] = cplex.linearNumExpr();
@@ -337,7 +337,7 @@ for(int j=0; j<n2;j++) {
 	}
 }
 
-//assignment #2
+//assignment2 - at every time, each cohort needs only one teacher and one subject
 IloLinearNumExpr[][] constr4 = new IloLinearNumExpr[teachingCohort][n4];
 
 for(int k=0;k<teachingCohort;k++) {
@@ -358,7 +358,7 @@ for(int k=0; k<teachingCohort;k++) {
 }
 
 
-//assignment #3
+//assignment3- each cohort assigned to 12 time periods
 IloLinearNumExpr[] assign3 = new IloLinearNumExpr[teachingCohort];
 
 for(int k=0;k<teachingCohort;k++) {
@@ -754,7 +754,18 @@ if(cplex.solve()) {
 			for(int j =0; j<n2;j++) {
 				for(int k=0;k<n3;k++) {
 					if((cplex.getValue(x[i][j][k][t])) >0.5) {
-						System.out.println("Teacher: "+ j +" Cohort: " + k + " Subject: " + subj[i] +" Time: "+ t);
+						System.out.print("Teacher: "+ j +" Cohort: " + k + " Subject: " + subj[i] +" Period: "+ (t+1));
+						if(t==0 || t== 1 || t==2|| t==3|| t==4|| t==5) {
+						System.out.println(" Day 1");
+						}else if(t==6|| t==7|| t==8|| t==9|| t==10|| t==11) {
+							System.out.println(" Day 2");
+						}else if(t==12|| t==13|| t==14|| t==15|| t==16|| t==17) {
+							System.out.println(" Day 3");
+						}else if(t==18|| t==19|| t==20|| t==21|| t==22|| t==23) {
+							System.out.println(" Day 4");
+						}else {
+							System.out.println(" Day 5");
+						}
 						if(i==0 && k==8) {
 							
 							math = math + lengtht[t];
