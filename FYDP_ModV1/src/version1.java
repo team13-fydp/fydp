@@ -492,7 +492,6 @@ for(int k = 0; k<frenchNum;k++){
 
 //constraint 10, science 
 IloLinearNumExpr[] sci1 = new IloLinearNumExpr[teachingCohort];
-//IloLinearNumExpr[] sci2 = new IloLinearNumExpr[teachingCohort];
 
 for(int k = 0; k<teachingCohort; k++){
 	sci1[k] = cplex.linearNumExpr();
@@ -500,8 +499,6 @@ for(int k = 0; k<teachingCohort; k++){
 	for(int j = 0; j<n2;j++){
 		for(int t = 0; t<n4;t++){
 			sci1[k].addTerm(lengtht[t], x[2][j][k][t]);
-			//sci2[k].addTerm(lengtht[t], x[2][j][k][t]);
-
 			}
 		}
 	}
@@ -544,23 +541,20 @@ for(int k = 0;k<teachingCohort;k++){
 	}
 
 //constraint 13, phys-ed
-IloLinearNumExpr [] phys1 = new IloLinearNumExpr[teachingCohort];
-//IloLinearNumExpr [] phys2 = new IloLinearNumExpr[teachingCohort];
+IloLinearNumExpr [] phys = new IloLinearNumExpr[teachingCohort];
 
 for(int k=0;k<teachingCohort;k++){
-	phys1[k] = cplex.linearNumExpr();
-	//phys2[k] = cplex.linearNumExpr();
+	phys[k] = cplex.linearNumExpr();
 	for(int j=0;j<n2;j++){
 		for(int t=0;t<n4;t++){
-			phys1[k].addTerm(lengtht[t], x[5][j][k][t]);
-			//phys2[k].addTerm(lengtht[t], x[5][j][k][t]);
+			phys[k].addTerm(lengtht[t], x[5][j][k][t]);
 			}
 		}
 	}
 
 for(int k=0;k<teachingCohort;k++){
-	cplex.addGe(phys1[k], 150);
-	cplex.addLe(phys1[k],200);
+	cplex.addGe(phys[k], 150);
+	cplex.addLe(phys[k],200);
 	}
 
 //constraint 14, french for applicable classes
@@ -792,14 +786,14 @@ if(cplex.solve()) {
 	}
 	totalMin = math+lan+sci+art1+soc1+gym+french3;
 	
-	System.out.println("Math" + math);
-	System.out.println("Language" + lan);
-	System.out.println("Science" + sci);
-	System.out.println("Art" + art1);
-	System.out.println("Social Studies" + soc1);
-	System.out.println("Gym" + gym);
-	System.out.println("French" + french3);
-	System.out.println("Total Teaching Minutes" + totalMin);
+	System.out.println("Math: " + math);
+	System.out.println("Language: " + lan);
+	System.out.println("Science: " + sci);
+	System.out.println("Art: " + art1);
+	System.out.println("Social Studies: " + soc1);
+	System.out.println("Gym: " + gym);
+	System.out.println("French: " + french3);
+	System.out.println("Total Teaching Minutes: " + totalMin);
 	
 	
 }
