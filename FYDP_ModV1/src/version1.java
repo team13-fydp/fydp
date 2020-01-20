@@ -233,10 +233,10 @@ public class version1 {
 			}
 			
 			//y is binary for teacher to subject to cohort assigment
-			IloNumVar [][][] y = new IloNumVar[n][n2][n3];
-			for(int i = 0;i<n;i++) {
+			IloNumVar [][][] y = new IloNumVar[subjects][n2][teachingCohort];
+			for(int i = 0;i<subjects;i++) {
 				for(int j=0;j<n2;j++){
-					for(int k=0;k<n3;k++) {
+					for(int k=0;k<teachingCohort;k++) {
 							String varName = "y" + i+j+k; 
 							y[i][j][k] =cplex.boolVar(varName);
 					}
@@ -366,7 +366,7 @@ public class version1 {
 //define constraints
 			
 //one teacher assigned to subject per cohort part1
-IloLinearNumExpr[][] assign2 = new IloLinearNumExpr[teachingCohort][n4];
+IloLinearNumExpr[][] assign2 = new IloLinearNumExpr[subjects][teachingCohort];
 for(int i=0;i<subjects;i++) {
 	for(int k=0; k<teachingCohort;k++) {	
 		assign2[i][k] = cplex.linearNumExpr();
@@ -936,21 +936,21 @@ for(int k=0;k<frenchNum;k++) {
 	fr4[k] = cplex.linearNumExpr();
 	fr5[k] = cplex.linearNumExpr();
 	
-	for(int j=0;j<n2;j++) {
+	for(int j=0;j<frenchTeach;j++) {
 		for(int t =day1s;t<day1f;t++) {
-			fr1[k].addTerm(1, x[6][j][k+frenchCohortlb][t]);
+			fr1[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
 			}
 		for(int t=day2s; t<day2f;t++){
-			fr2[k].addTerm(1, x[6][j][k+frenchCohortlb][t]);
+			fr2[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
 			}
 		for(int t=day3s; t<day3f;t++){
-			fr3[k].addTerm(1, x[6][j][k+frenchCohortlb][t]);
+			fr3[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
 			}
 		for(int t = day4s; t<day4f;t++){
-			fr4[k].addTerm(1, x[6][j][k+frenchCohortlb][t]);
+			fr4[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
 			}
 		for(int t=day5s; t<day5f; t++){
-			fr5[k].addTerm(1, x[6][j][k+frenchCohortlb][t]);
+			fr5[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
 			}
 		}
 	}
@@ -1169,7 +1169,7 @@ for(int k = 0; k<teachingCohort; k++) {
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 2.0e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 8.0e-2);
 //solve 
 if(cplex.solve()) {
 
