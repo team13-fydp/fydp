@@ -262,7 +262,7 @@ public class version1 {
 					v[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
 			}
-			/*
+			
 			//Slack Variable for science even distribution
 			IloIntVar [][] u2 = new IloIntVar[teachingCohort][numDays];
 			
@@ -321,7 +321,7 @@ public class version1 {
 					String varName = "v4"+a+b;
 					v4[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
-			}*/
+			}
 			
 			//Indicator variable for Primary Classes Language back to back
 			IloIntVar [][] a = new IloIntVar[primary][blockCount];
@@ -351,7 +351,7 @@ public class version1 {
 					objective.addTerm(-pjd, v[j][d]);
 				}
 			}
-			/*
+			
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
@@ -359,7 +359,7 @@ public class version1 {
 					objective.addTerm(-150, v3[k][d]); //gym
 					objective.addTerm(-150, v4[k][d]); //social studies
 				}
-			}*/
+			}
 						
 			cplex.addMaximize(objective);
 			
@@ -938,19 +938,19 @@ for(int k=0;k<frenchNum;k++) {
 	
 	for(int j=0;j<frenchTeach;j++) {
 		for(int t =day1s;t<day1f;t++) {
-			fr1[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
+			fr1[k].addTerm(1, x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		for(int t=day2s; t<day2f;t++){
-			fr2[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
+			fr2[k].addTerm(1, x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		for(int t=day3s; t<day3f;t++){
-			fr3[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
+			fr3[k].addTerm(1, x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		for(int t = day4s; t<day4f;t++){
-			fr4[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
+			fr4[k].addTerm(1, x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		for(int t=day5s; t<day5f; t++){
-			fr5[k].addTerm(1, x[6][j+frenchTeach][k+frenchCohortlb][t]);
+			fr5[k].addTerm(1, x[6][j+frenchTeachlb][k+frenchCohortlb][t]);
 			}
 		}
 	}
@@ -1005,7 +1005,7 @@ for(int k=0;k<frenchNum;k++) {
 }
 
 //constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
-/*
+
 IloLinearNumExpr [] gym1 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym2 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym3 = new IloLinearNumExpr[teachingCohort];
@@ -1165,7 +1165,7 @@ for(int k = 0; k<teachingCohort; k++) {
 		cplex.addGe(slack4[k][d], 0);
 		cplex.addGe(surplus4[k][d], 0);
 	}
-}*/
+}
 
 cplex.exportModel("lpex1.lp");
 //tolerance
