@@ -262,7 +262,7 @@ public class version1 {
 					v[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
 			}
-			
+			/*
 			//Slack Variable for science even distribution
 			IloIntVar [][] u2 = new IloIntVar[teachingCohort][numDays];
 			
@@ -321,7 +321,7 @@ public class version1 {
 					String varName = "v4"+a+b;
 					v4[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
-			}
+			}*/
 			
 			//Indicator variable for Primary Classes Language back to back
 			IloIntVar [][] a = new IloIntVar[primary][blockCount];
@@ -351,7 +351,7 @@ public class version1 {
 					objective.addTerm(-pjd, v[j][d]);
 				}
 			}
-			
+			/*
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
@@ -359,7 +359,7 @@ public class version1 {
 					objective.addTerm(-150, v3[k][d]); //gym
 					objective.addTerm(-150, v4[k][d]); //social studies
 				}
-			}
+			}*/
 						
 			cplex.addMaximize(objective);
 			
@@ -1005,7 +1005,7 @@ for(int k=0;k<frenchNum;k++) {
 }
 
 //constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
-
+/*
 IloLinearNumExpr [] gym1 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym2 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym3 = new IloLinearNumExpr[teachingCohort];
@@ -1165,27 +1165,30 @@ for(int k = 0; k<teachingCohort; k++) {
 		cplex.addGe(slack4[k][d], 0);
 		cplex.addGe(surplus4[k][d], 0);
 	}
-}
+}*/
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 8.0e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 10.0e-2);
 //solve 
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
 	System.out.println("Teacher, Cohort, Subject, Period, Day");
 		
-	int math = 0;
-	int lan = 0;
-	int art1 = 0;
-	int soc1 = 0;
-	int sci = 0;
-	int gym = 0;
-	int mus = 0;
-	int dram = 0;
-	int french3 = 0;
-	int totalMin = 0;
+	int mathTime[] = new int [teachingCohort];
+	int langTime[] = new int [teachingCohort];
+	int artTime[] = new int [teachingCohort];
+	int socTime[] = new int [teachingCohort];
+	int sciTime[] = new int [teachingCohort];
+	int gymTime[] = new int [teachingCohort];
+	int musTime[] = new int [teachingCohort];
+	int dramTime[] = new int [teachingCohort];
+	int frenchTime[] = new int [teachingCohort];
+	int totalMinTime[] = new int [n2];
+	int prepTime[] = new int [n2];
+	int teachTime[] = new int [n2];
+	int awayTime[] = new int [n2];
 	
 	
 	for(int t =0; t<n4;t++) {
@@ -1193,6 +1196,7 @@ if(cplex.solve()) {
 			for(int j =0; j<n2;j++) {
 				for(int k=0;k<n3;k++) {
 					if((cplex.getValue(x[i][j][k][t])) >0.5) {
+						totalMinTime[k] = totalMinTime[k] + lengtht[t];	
 						System.out.print("Teacher: "+ j +" Cohort: " + k + " Subject: " + subj[i] +" Period: "+ (t+1));
 						if(t==0 || t== 1 || t==2|| t==3|| t==4|| t==5) {
 						System.out.println(" Day 1");
@@ -1205,33 +1209,42 @@ if(cplex.solve()) {
 						}else {
 							System.out.println(" Day 5");
 						}
-						if(i==0 && k==8) {
+						if(i==0) {
 							
-							math = math + lengtht[t];
+							mathTime[k] = mathTime[k] + lengtht[t];
 						}
-						if(i==1 && k==8) {
-							lan = lan+ lengtht[t];
+						if(i==1) {
+							langTime[k] = langTime[k] + lengtht[t];
 						}
-						if(i==2 && k==8) {
-							sci = sci+lengtht[t];
+						if(i==2) {
+							sciTime[k] = sciTime[k] + lengtht[t];
 						}
-						if(i==3 && k==8) {
-							art1 = art1 + lengtht[t];
+						if(i==3) {
+							artTime[k] = artTime[k] + lengtht[t];
 						}
-						if(i==4 && k==8) {
-							soc1 = soc1 + lengtht[t];
+						if(i==4) {
+							socTime[k] = socTime[k] + lengtht[t];
 						}
-						if(i==5 && k==8) {
-							gym = gym+lengtht[t];
+						if(i==5) {
+							gymTime[k] = gymTime[k] + lengtht[t];
 						}
-						if(i==6 && k==8) {
-							french3 = french3 + lengtht[t];
+						if(i==6) {
+							frenchTime[k] = frenchTime[k] + lengtht[t];
 						}
-						if(i==7 && k==8) {
-							mus = mus + lengtht[t];
+						if(i==7) {
+							musTime[k] = musTime[k] + lengtht[t];
 						}
-						if(i==8 && k==8) {
-							dram = dram + lengtht[t];
+						if(i==8) {
+							dramTime[k] = dramTime[k] + lengtht[t];
+						}
+						if(i==prepSubject) {
+							prepTime[j] = prepTime[j] + lengtht[t];
+						}
+						else if(i==awaySubject) {
+							awayTime[j] = awayTime[j] + lengtht[t];
+						}
+						else {
+							teachTime[j] = teachTime[j] + lengtht[t];
 						}
 						
 					}
@@ -1240,18 +1253,75 @@ if(cplex.solve()) {
 		}
 		
 	}
-	totalMin = math+lan+sci+art1+soc1+gym+french3+mus+dram;
 	
-	System.out.println("Math: " + math);
-	System.out.println("Language: " + lan);
-	System.out.println("Science: " + sci);
-	System.out.println("Art: " + art1);
-	System.out.println("Social Studies: " + soc1);
-	System.out.println("Gym: " + gym);
-	System.out.println("French: " + french3);
-	System.out.println("Music: " + mus);
-	System.out.println("Drama: " + drama);
-	System.out.println("Total Teaching Minutes: " + totalMin);
+	System.out.println("Prep Time: ");
+	for(int j=0; j< n2; j++) {
+		System.out.print(j +":  " + prepTime[j] + ", ");
+	}
+	
+	System.out.println("");
+	System.out.println("Away Time: ");
+	for(int j=0; j< n2; j++) {
+		System.out.print(j +":  " + awayTime[j] + ", ");
+	}
+	
+	System.out.println("");
+	System.out.println("Teach Time: ");
+	for(int j=0; j< n2; j++) {
+		System.out.print(j +":  " + awayTime[j] + ", ");
+	}
+	
+	System.out.println("");
+	System.out.println("Math: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +":  " + mathTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Language: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +":  " + langTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Science: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +":  " + sciTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Art: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + artTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Social Studies: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + socTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Gym: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + gymTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("French: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + frenchTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Music: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + musTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Drama: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + dramTime[k] + ", ");
+	}
+	System.out.println("");
+	System.out.println("Total mins per class: ");
+	for(int k=0; k< teachingCohort; k++) {
+		System.out.print(k +": " + totalMinTime[k] + ", ");
+	}
+
 	
 	
 }
