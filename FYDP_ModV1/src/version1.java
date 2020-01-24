@@ -262,7 +262,7 @@ public class version1 {
 					v[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
 			}
-			/*
+			
 			//Slack Variable for science even distribution
 			IloIntVar [][] u2 = new IloIntVar[teachingCohort][numDays];
 			
@@ -321,7 +321,7 @@ public class version1 {
 					String varName = "v4"+a+b;
 					v4[a][b] = cplex.intVar(0, Integer.MAX_VALUE, varName);
 				}
-			}*/
+			}
 			
 			//Indicator variable for Primary Classes Language back to back
 			IloIntVar [][] a = new IloIntVar[primary][blockCount];
@@ -340,6 +340,7 @@ public class version1 {
 					for(int k=0;k<teachingCohort;k++) {
 						for(int t=0;t<n4;t++) {
 							objective.addTerm(rewards[k][j][i], x[i][j][k][t]);
+							//objective.addTerm(1, x[i][j][k][t]);
 						}
 					}
 				}
@@ -1003,9 +1004,9 @@ for(int k=0;k<frenchNum;k++) {
 	cplex.addGe(lg4[k],1);
 	cplex.addGe(lg5[k],1);
 }
-
-//constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
 /*
+//constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
+
 IloLinearNumExpr [] gym1 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym2 = new IloLinearNumExpr[teachingCohort];
 IloLinearNumExpr [] gym3 = new IloLinearNumExpr[teachingCohort];
@@ -1129,7 +1130,7 @@ for(int k=0;k<teachingCohort;k++){
 	cplex.addEq(ss4[k], 1);
 	cplex.addEq(ss5[k], 1);
 }
-
+/*
 //slack and surplus variables for sci, gym, social studies even distribution
 IloLinearNumExpr [][] slack3 = new IloLinearNumExpr [teachingCohort][numDays];
 IloLinearNumExpr [][] surplus3 = new IloLinearNumExpr [teachingCohort][numDays];
@@ -1165,11 +1166,11 @@ for(int k = 0; k<teachingCohort; k++) {
 		cplex.addGe(slack4[k][d], 0);
 		cplex.addGe(surplus4[k][d], 0);
 	}
-}*/
-
+}
+*/
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 10.0e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
 //solve 
 if(cplex.solve()) {
 
@@ -1268,7 +1269,7 @@ if(cplex.solve()) {
 	System.out.println("");
 	System.out.println("Teach Time: ");
 	for(int j=0; j< n2; j++) {
-		System.out.print(j +":  " + awayTime[j] + ", ");
+		System.out.print(j +":  " + teachTime[j] + ", ");
 	}
 	
 	System.out.println("");
