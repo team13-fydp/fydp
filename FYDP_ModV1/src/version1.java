@@ -352,7 +352,7 @@ public class version1 {
 					objective.addTerm(-pjd, v[j][d]);
 				}
 			}
-			/*
+			
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
@@ -360,7 +360,7 @@ public class version1 {
 					objective.addTerm(-150, v3[k][d]); //gym
 					objective.addTerm(-150, v4[k][d]); //social studies
 				}
-			}*/
+			}
 						
 			cplex.addMaximize(objective);
 			
@@ -1004,7 +1004,7 @@ for(int k=0;k<frenchNum;k++) {
 	cplex.addGe(lg4[k],1);
 	cplex.addGe(lg5[k],1);
 }
-/*
+
 //constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
 
 IloLinearNumExpr [] gym1 = new IloLinearNumExpr[teachingCohort];
@@ -1130,7 +1130,7 @@ for(int k=0;k<teachingCohort;k++){
 	cplex.addEq(ss4[k], 1);
 	cplex.addEq(ss5[k], 1);
 }
-/*
+
 //slack and surplus variables for sci, gym, social studies even distribution
 IloLinearNumExpr [][] slack3 = new IloLinearNumExpr [teachingCohort][numDays];
 IloLinearNumExpr [][] surplus3 = new IloLinearNumExpr [teachingCohort][numDays];
@@ -1167,7 +1167,7 @@ for(int k = 0; k<teachingCohort; k++) {
 		cplex.addGe(surplus4[k][d], 0);
 	}
 }
-*/
+
 cplex.exportModel("lpex1.lp");
 //tolerance
 cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
