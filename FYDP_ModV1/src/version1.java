@@ -665,7 +665,7 @@ for(int k = 0; k<teachingCohort; k++){
 	}
 
 for(int k = 0;k<teachingCohort; k++){
-	cplex.addGe(art[k], 40);
+	cplex.addGe(art[k], 80);
 }
 
 //constraint 12, social studies
@@ -745,7 +745,7 @@ for(int k=0;k<teachingCohort;k++){
 	}
 
 for(int k=0;k<teachingCohort;k++){
-	cplex.addGe(music[k], 40);
+	cplex.addGe(music[k], 80);
 }
 
 //constraint 21, drama
@@ -1049,7 +1049,7 @@ for(int k=0;k<teachingCohort;k++){
 			ss1[k].addTerm(1, x[4][j][k][t]);
 		}
 	}
-	gym1[k].addTerm(1, u3[k][0]);
+	//gym1[k].addTerm(1, u3[k][0]);
 	gym1[k].addTerm(-1, v3[k][0]);
 	sc1[k].addTerm(1, u2[k][0]);
 	sc1[k].addTerm(-1, v2[k][0]);
@@ -1063,7 +1063,7 @@ for(int k=0;k<teachingCohort;k++){
 			ss2[k].addTerm(1, x[4][j][k][t]);
 		}
 	}
-	gym2[k].addTerm(1, u3[k][1]);
+	//gym2[k].addTerm(1, u3[k][1]);
 	gym2[k].addTerm(-1, v3[k][1]);
 	sc2[k].addTerm(1, u2[k][1]);
 	sc2[k].addTerm(-1, v2[k][1]);
@@ -1077,7 +1077,7 @@ for(int k=0;k<teachingCohort;k++){
 			ss3[k].addTerm(1, x[4][j][k][t]);
 		}
 	}
-	gym3[k].addTerm(1, u3[k][2]);
+	//gym3[k].addTerm(1, u3[k][2]);
 	gym3[k].addTerm(-1, v3[k][2]);
 	sc3[k].addTerm(1, u2[k][2]);
 	sc3[k].addTerm(-1, v2[k][2]);
@@ -1091,7 +1091,7 @@ for(int k=0;k<teachingCohort;k++){
 			ss4[k].addTerm(1, x[4][j][k][t]);
 		}
 	}
-	gym4[k].addTerm(1, u3[k][3]);
+	//gym4[k].addTerm(1, u3[k][3]);
 	gym4[k].addTerm(-1, v3[k][3]);
 	sc4[k].addTerm(1, u2[k][3]);
 	sc4[k].addTerm(-1, v2[k][3]);
@@ -1105,7 +1105,7 @@ for(int k=0;k<teachingCohort;k++){
 			ss5[k].addTerm(1, x[4][j][k][t]);
 		}
 	}
-	gym5[k].addTerm(1, u3[k][4]);
+	//gym5[k].addTerm(1, u3[k][4]);
 	gym5[k].addTerm(-1, v3[k][4]);
 	sc5[k].addTerm(1, u2[k][4]);
 	sc5[k].addTerm(-1, v2[k][4]);
@@ -1114,11 +1114,11 @@ for(int k=0;k<teachingCohort;k++){
  }
 	
 for(int k=0;k<teachingCohort;k++){
-	cplex.addEq(gym1[k], 1);
-	cplex.addEq(gym2[k], 1);
-	cplex.addEq(gym3[k], 1);
-	cplex.addEq(gym4[k], 1);
-	cplex.addEq(gym5[k], 1);	
+	cplex.addLe(gym1[k], 1);
+	cplex.addLe(gym2[k], 1);
+	cplex.addLe(gym3[k], 1);
+	cplex.addLe(gym4[k], 1);
+	cplex.addLe(gym5[k], 1);	
 	cplex.addEq(sc1[k], 1);
 	cplex.addEq(sc2[k], 1);
 	cplex.addEq(sc3[k], 1);
@@ -1141,14 +1141,14 @@ IloLinearNumExpr [][] surplus4 = new IloLinearNumExpr [teachingCohort][numDays];
 
 for(int k = 0; k<teachingCohort; k++) {
 	for(int d = 0; d<numDays;d++) {
-		slack3[k][d] = cplex.linearNumExpr();
+		//slack3[k][d] = cplex.linearNumExpr();
 		surplus3[k][d] = cplex.linearNumExpr();
 		slack2[k][d] = cplex.linearNumExpr();
 		surplus2[k][d] = cplex.linearNumExpr();
 		slack4[k][d] = cplex.linearNumExpr();
 		surplus4[k][d] = cplex.linearNumExpr();
 		
-		slack3[k][d].addTerm(1, u3[k][d]);
+		//slack3[k][d].addTerm(1, u3[k][d]);
 		surplus3[k][d].addTerm(1, v3[k][d]);
 		slack2[k][d].addTerm(1, u2[k][d]);
 		surplus2[k][d].addTerm(1, v2[k][d]);
@@ -1159,7 +1159,7 @@ for(int k = 0; k<teachingCohort; k++) {
 
 for(int k = 0; k<teachingCohort; k++) {
 	for(int d = 0; d<numDays;d++) {
-		cplex.addGe(slack3[k][d], 0);
+		//cplex.addGe(slack3[k][d], 0);
 		cplex.addGe(surplus3[k][d], 0);
 		cplex.addGe(slack2[k][d], 0);
 		cplex.addGe(surplus2[k][d], 0);
@@ -1170,7 +1170,7 @@ for(int k = 0; k<teachingCohort; k++) {
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 6.0e-2);
 //solve 
 if(cplex.solve()) {
 
