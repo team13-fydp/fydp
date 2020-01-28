@@ -35,6 +35,7 @@ public class version1 {
 		//only use these to get the max index of n and n3 to be used for a contraint
 		int cohortRange = n3-1;
 		int subjectRange = n-1;
+		string[] grades;
 		
 	//define parameters - time
 		int n4 = 30;
