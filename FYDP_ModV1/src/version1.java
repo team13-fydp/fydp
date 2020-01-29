@@ -19,23 +19,25 @@ public class version1 {
 	//define parameters - teachers
 		int n2 = 16;
 		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
-		int frenchTeachlb = 14;
-		int frenchTeachub = 15;
+		int frenchTeachlb = n2-2;
+		int frenchTeachub = n2-1;
 		int frenchTeach = 2;
+		String [] teacherNames;
 	
 	//define parameters - cohorts
 		int n3 = 13;
 		int teachingCohort = n3-2;
 		int primaryUb = 3;
-		int frenchCohortlb = 3;
-		int frenchCohortub = 11;
-		int frenchNum = 8;
-		//int classUb = n3-2;
+		int frenchCohortlb = primaryUb;
+		int frenchNum = teachingCohort-frenchCohortlb;
 		int prepCohort = n3-1;
 		int awayCohort = n3-2;
 		
-		int cohortRange = 12;
-		int subjectRange = 10;
+		//only use these to get the max index of n and n3 to be used for a contraint
+		int cohortRange = n3-1;
+		int subjectRange = n-1;
+		String[] gradeNames;
+		String[] cohortNames;
 		
 	//define parameters - time
 		int n4 = 30;
@@ -136,7 +138,14 @@ public class version1 {
 		}*/
 				
 	//time periods array
-		int [] lengtht = {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
+		int timeChoice = 0;
+		int [] lengtht;
+		if (timeChoice==0) {
+			lengtht = new int[] {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
+		}
+		else {
+			lengtht = new int[] {60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,};
+		}
 		
 	//defining initial reward matrix
 		int [][][] rewards = new int [teachingCohort][n2][subjects];
@@ -209,7 +218,7 @@ public class version1 {
 		int numDays = 5;
 		
 		//Number of Primary Classes
-		int primary = 3;
+		int primary = primaryUb;
 		int blockCount = 15;
 		int blocks = 3;
 		
@@ -352,15 +361,15 @@ public class version1 {
 					objective.addTerm(-pjd, v[j][d]);
 				}
 			}
-			/*
+			
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
-					objective.addTerm(-150, v2[k][d]); //science
-					objective.addTerm(-150, v3[k][d]); //gym
-					objective.addTerm(-150, v4[k][d]); //social studies
+					objective.addTerm(-80, v2[k][d]); //science
+					objective.addTerm(-80, v3[k][d]); //gym
+					objective.addTerm(-80, v4[k][d]); //social studies
 				}
-			}*/
+			}
 						
 			cplex.addMaximize(objective);
 			
@@ -452,7 +461,7 @@ for(int j=0; j<n2;j++) {
 		
 	}
 }
-//teacher can only teach one subject/class at a time - if you're assigned to teach, cant be assigned away/prep and vice versa
+//teacher can only teach one subject/class at a time - cant be assigned to teach or prep if not available
 for(int j=0; j<n2;j++) {
 	for(int t=0;t<n4;t++) {
 		constr3[j][t] = cplex.linearNumExpr();
@@ -1004,7 +1013,7 @@ for(int k=0;k<frenchNum;k++) {
 	cplex.addGe(lg4[k],1);
 	cplex.addGe(lg5[k],1);
 }
-/*
+
 //constraint 24 minimize # of times cohorts have gym, science, and social studies on the same day- not included in pull request- keep for testing
 
 IloLinearNumExpr [] gym1 = new IloLinearNumExpr[teachingCohort];
@@ -1130,7 +1139,7 @@ for(int k=0;k<teachingCohort;k++){
 	cplex.addEq(ss4[k], 1);
 	cplex.addEq(ss5[k], 1);
 }
-/*
+
 //slack and surplus variables for sci, gym, social studies even distribution
 IloLinearNumExpr [][] slack3 = new IloLinearNumExpr [teachingCohort][numDays];
 IloLinearNumExpr [][] surplus3 = new IloLinearNumExpr [teachingCohort][numDays];
@@ -1167,7 +1176,7 @@ for(int k = 0; k<teachingCohort; k++) {
 		cplex.addGe(surplus4[k][d], 0);
 	}
 }
-*/
+
 cplex.exportModel("lpex1.lp");
 //tolerance
 cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
