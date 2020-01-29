@@ -1,14 +1,149 @@
 import ilog.concert.*;
 import ilog.cplex.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.io.FileOutputStream;
+ 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class version1 {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		modelConfig();
+	public static void main(String[] args) throws IOException {
+		
+		//read
+				String excelFilePath = "Jan-28-Front-End.xlsx";
+		        FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+		        
+		        Workbook workbook = new XSSFWorkbook(inputStream);
+		        int numberOfSheets = workbook.getNumberOfSheets();
+		        Sheet inputSheet2 = workbook.getSheetAt(1);
+		        int cohortNameStartRow = 28; 
+		        int cohortNameStartCol = 2;
+		        int gradeNameStartRow = 29;
+		        int gradeNameStartCol  = 2;
+		        int n2= 5;
+		        int teachingCohort = 11;
+		        String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
+		        int subjects = subj.length -2;
+		        String[] cohortNames = new String[teachingCohort];
+		        String[] gradeNames = new String[teachingCohort];
+		        
+		        for(int k=0; k<teachingCohort; k++) {
+		        	cohortNames[k]= inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue();
+		        	gradeNames[k]= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).toString();
+		        }
+		    
+		       
+		      //input sheet2- home room rewards matrix psuedo code (assume already read in teachers and their names)
+		        ArrayList<String> teacherNames = new ArrayList<String>() { 
+		            { 
+		                add("Teacher1"); 
+		                add("Teacher2"); 
+		                add("Teacher3"); 
+		                add("Teacher4"); 
+		                add("Teacher5"); 
+		            } 
+		        }; 
+		        
+		       
+		        double [][][] rewards = new double [teachingCohort][n2][subjects];
+		        int homeRoomTeacherStartRow = 32; 
+		        int homeRoomTeacherStartCol = 1;
+		        String cellHomeRoomCohort;
+		        int homeRoomReward = 200;
+		        int count = 0;
+		        
+				for(int j=0; j<n2; j++){
+					for(int k=0; k<teachingCohort; k++) {
+						for(int i=0; i<subjects; i++) {
+							cellHomeRoomCohort = inputSheet2.getRow(homeRoomTeacherStartRow+j*2).getCell(homeRoomTeacherStartCol+k).getStringCellValue();
+							
+							if (cellHomeRoomCohort != "") {
+							rewards[k][j][i] = homeRoomReward;
+							}
+					
+						}
+					}
+				} 
+				
+				
+				//input sheet 3- specialty teacher rewards matrix psuedo code
+				
+				Sheet inputSheet3 = workbook.getSheetAt(2);
+				int specialtyTeacherStartRow = 7;
+				int specialtyTeacherCol = 0;
+				int subjectCol = 1;
+				int ratingCol = 2;
+				int cohortStartCol = 6;
+				int numSpecialtyTeach =0;
+				int incr =0;
+				double rating;
+				String specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow).getCell(specialtyTeacherCol).getStringCellValue();
+				
+				while(specialtyTeacherCell != "") {
+					specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow+incr*2).getCell(specialtyTeacherCol).getStringCellValue();
+					incr++;
+				}
+				numSpecialtyTeach = incr-1;
+			
+				String teacherName;
+				String subjectName;
+				int teacherIndex=0;
+				int subjectIndex =0;
+				
+				for(int j=0; j<numSpecialtyTeach; j++) {
+					teacherName=  inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(specialtyTeacherCol).getStringCellValue();
+					for(int a=0; a<teacherNames.size(); a++) {
+						if(teacherName.equals(teacherNames.get(a))) {
+							teacherIndex= a;
+						}
+					}
+				
+					subjectName = inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(subjectCol).getStringCellValue();
+				
+					for(int i=0; i<subj.length-2; i++) {
+						if(subj[i].equals(subjectName)) {
+							subjectIndex = i;
+						}
+					}
+					String cellSpecialtyCohort;
+					rating= inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(ratingCol).getNumericCellValue();
+					for(int k=0; k<teachingCohort; k++) {
+						cellSpecialtyCohort = inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(cohortStartCol+k).getStringCellValue();
+						if(!cellSpecialtyCohort.equals("")) {
+							rewards[k][teacherIndex][subjectIndex] = rating;
+						}
+					}
+				}
+				
+				//testing only
+				for(int i=0; i<subjects; i++) {
+					for(int k=0; k< teachingCohort; k++) {
+						for(int j=0; j<n2; j++) {
+							if(rewards[k][j][i] == 3) {
+								System.out.println(rewards[k][j][i]);
+							}
+						}
+					}
+				}
+				System.out.println(rewards[1][1][0]);
+				System.out.println(rewards[0][1][0]);
+				System.out.println(rewards[5][1][5]);
+				System.out.println(rewards[2][3][2]);
+		        
+		//modelConfig();
 	}
 	
 	public static void modelConfig() {
+         
 	 //define parameters - subjects
 		int n = 11;
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
@@ -37,7 +172,6 @@ public class version1 {
 		int cohortRange = n3-1;
 		int subjectRange = n-1;
 		String[] gradeNames;
-		String[] cohortNames;
 		
 	//define parameters - time
 		int n4 = 30;
@@ -90,52 +224,6 @@ public class version1 {
 				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
 				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
-		
-	//time periods matrix
-	/*	int [][] availableTime = new int[n2][n4];
-		//fill availableTime matrix
-		
-		//first nine rows are 1
-		for(int a = 0; a<=3;a++) {
-			for(int b=0;b<=29;b++) {
-				availableTime[a][b]=1;
-			}
-		}
-		
-		for(int c=0;c<=20;c++) {
-			availableTime[4][c]=1;
-		}
-		
-		for(int a = 5; a<=10;a++) {
-			for(int b=0;b<=29;b++) {
-				availableTime[a][b]=1;
-			}
-		}
-		
-		for(int c=24;c<=29;c++) {
-			availableTime[11][c]=1;
-		}
-		
-		for(int c = 18; c<=23;c++) {
-			availableTime[12][c] = 1;
-		}
-		
-		for(int c = 0; c<=8;c++) {
-			availableTime[13][c] = 1; 
-		}
-		for(int c = 21; c<=29;c++) {
-			availableTime[13][c] = 1; 
-		}
-		
-		for(int c = 0; c<=5;c++) {
-			availableTime[14][c] = 1; 
-		}
-		for(int c = 0; c<=8;c++) {
-			availableTime[15][c] = 1; 
-		}
-		for(int c = 0; c<=29;c++) {
-			availableTime[16][c] = 1; 
-		}*/
 				
 	//time periods array
 		int timeChoice = 0;
