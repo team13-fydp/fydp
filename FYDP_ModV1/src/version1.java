@@ -59,7 +59,7 @@ public class version1 {
 		        int homeRoomTeacherStartRow = 32; 
 		        int homeRoomTeacherStartCol = 1;
 		        String cellHomeRoomCohort;
-		        int homeRoomReward = 200;
+		        int homeRoomReward = 300;
 		        int count = 0;
 		        
 				for(int j=0; j<n2; j++){
