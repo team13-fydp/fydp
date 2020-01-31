@@ -36,6 +36,7 @@ public class version1 {
 		        String[] cohortNames = new String[teachingCohort];
 		        String[] gradeNames = new String[teachingCohort];
 		        
+		        //read in cohort names
 		        for(int k=0; k<teachingCohort; k++) {
 		        	cohortNames[k]= inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue();
 		        	gradeNames[k]= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).toString();
@@ -86,6 +87,7 @@ public class version1 {
 				int numSpecialtyTeach =0;
 				int incr =0;
 				double rating;
+				int specialtyWeight= 50;
 				String specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow).getCell(specialtyTeacherCol).getStringCellValue();
 				
 				while(specialtyTeacherCell != "") {
@@ -119,7 +121,7 @@ public class version1 {
 					for(int k=0; k<teachingCohort; k++) {
 						cellSpecialtyCohort = inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(cohortStartCol+k).getStringCellValue();
 						if(!cellSpecialtyCohort.equals("")) {
-							rewards[k][teacherIndex][subjectIndex] = rating;
+							rewards[k][teacherIndex][subjectIndex] = rating*specialtyWeight;
 						}
 					}
 				}
@@ -128,17 +130,13 @@ public class version1 {
 				for(int i=0; i<subjects; i++) {
 					for(int k=0; k< teachingCohort; k++) {
 						for(int j=0; j<n2; j++) {
-							if(rewards[k][j][i] == 4) {
+							if(rewards[k][j][i] == 100) {
 								//System.out.println(rewards[k][j][i]);
 								System.out.println("hi");
 							}
 						}
 					}
 				}
-			//	System.out.println(rewards[1][1][0]);
-			//	System.out.println(rewards[0][1][0]);
-			//  System.out.println(rewards[5][1][5]);
-			//	System.out.println(rewards[2][3][2]);
 		        
 		//modelConfig();
 	}
