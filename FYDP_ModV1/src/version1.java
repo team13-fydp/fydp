@@ -128,17 +128,17 @@ public class version1 {
 				for(int i=0; i<subjects; i++) {
 					for(int k=0; k< teachingCohort; k++) {
 						for(int j=0; j<n2; j++) {
-							if(rewards[k][j][i] == 3) {
+							if(rewards[k][j][i] == 4) {
 								//System.out.println(rewards[k][j][i]);
 								System.out.println("hi");
 							}
 						}
 					}
 				}
-				System.out.println(rewards[1][1][0]);
-				System.out.println(rewards[0][1][0]);
-				System.out.println(rewards[5][1][5]);
-				System.out.println(rewards[2][3][2]);
+			//	System.out.println(rewards[1][1][0]);
+			//	System.out.println(rewards[0][1][0]);
+			//  System.out.println(rewards[5][1][5]);
+			//	System.out.println(rewards[2][3][2]);
 		        
 		//modelConfig();
 	}
