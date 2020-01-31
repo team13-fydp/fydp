@@ -129,7 +129,8 @@ public class version1 {
 					for(int k=0; k< teachingCohort; k++) {
 						for(int j=0; j<n2; j++) {
 							if(rewards[k][j][i] == 3) {
-								System.out.println(rewards[k][j][i]);
+								//System.out.println(rewards[k][j][i]);
+								System.out.println("hi");
 							}
 						}
 					}
