@@ -69,13 +69,13 @@ public class version1 {
         
             //get teacher names, allocation, and fte 
             //index of start of teacher matrix
-            int teacher_matrix_start = 8;
+            int teacher_matrix_start = 10;
             //teacher name col
             int teacher_name_col = 0;
             //fulltime col
             int full_time_col = 3;
             //teacher allocation row
-            int teacher_allocation_row = 9;
+            int teacher_allocation_col = 9;
             //french certification col
             int french_certification_col = 2;
             //if teacher is the first french teacher
@@ -85,6 +85,7 @@ public class version1 {
             //interate over two rows at a time 
             int q = teacher_matrix_start; 
             String teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
+            
             while(teacherName != ""){
             		Row currRow = sheetIndex.getRow(q);
             		boolean fullTime = false;
@@ -118,10 +119,9 @@ public class version1 {
             			 			}
             			 		}
             			 		if (k == french_certification_col) {
-            			 			//add 1 to french arr
             			 			if(cell.matches("(.*)x(.*)")) {
             			 				if(first_french == true) {
-            			 					//doublecheck
+            			 					//Index of first french teacher 
             			 					frenchTeachlb=teacherNames.size()-1;
             			 					first_french = false;
             			 				}
@@ -133,7 +133,7 @@ public class version1 {
             			 	case FORMULA:
             			 		FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             			 		CellValue cellValue = evaluator.evaluate(currCell);
-            			 		if(k==teacher_allocation_row ) {
+            			 		if(k==teacher_allocation_col ) {
             			 			if(fullTime == false) {
             			 			FTE.add(currCell.getNumericCellValue()/10);
             			 			}else {
@@ -171,6 +171,14 @@ public class version1 {
             }
            n2 = teacherNames.size();
 
+           System.out.println("N2 "+n2);
+           System.out.println("Schedulue Name " + schedule_name);
+           System.out.println("teacher name" +teacherNames);
+           System.out.println("tacher allocation " +FTE);
+           for ( int p = 0; p< availableTime.size();p++) {
+        	   	System.out.println("teacher time slot" + Arrays.toString(availableTime.get(p)) );
+           }
+           System.out.println("french teach lb" +frenchTeachlb);
            
         // end of reading in java
 		
