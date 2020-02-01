@@ -52,7 +52,7 @@ public class version1 {
         ArrayList<int[]> availableTime = new ArrayList<int[]>();
         //number of french teachers
         //index of first french teacher 
-        int frenchTeachlb = -1;
+        int first_french_teacher = -1;
         
             Sheet sheetIndex = workbook.getSheetAt(0);
             //getting schedule title
@@ -122,7 +122,8 @@ public class version1 {
             			 			if(cell.matches("(.*)x(.*)")) {
             			 				if(first_french == true) {
             			 					//Index of first french teacher 
-            			 					frenchTeachlb=teacherNames.size()-1;
+            			 					first_french_teacher=teacherNames.size();
+            			 					
             			 					first_french = false;
             			 				}
             			 			}
@@ -170,20 +171,11 @@ public class version1 {
 
             }
            n2 = teacherNames.size();
-
-           System.out.println("N2 "+n2);
-           System.out.println("Schedulue Name " + schedule_name);
-           System.out.println("teacher name" +teacherNames);
-           System.out.println("tacher allocation " +FTE);
-           for ( int p = 0; p< availableTime.size();p++) {
-        	   	System.out.println("teacher time slot" + Arrays.toString(availableTime.get(p)) );
-           }
-           System.out.println("french teach lb" +frenchTeachlb);
-           
-        // end of reading in java
+           int frenchTeach = n2 - first_french_teacher;
+           int frenchTeachlb = n2 - frenchTeach;
 		
 		
-	//start of model
+	 //start of model
 	 //define parameters - subjects
 		int n = 11;
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
@@ -198,7 +190,7 @@ public class version1 {
 //		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
 //		int frenchTeachlb = n2-2;
 		int frenchTeachub = n2-1;
-		int frenchTeach = 2;
+//		int frenchTeach = 2;
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
