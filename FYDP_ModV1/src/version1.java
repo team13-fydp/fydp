@@ -53,9 +53,8 @@ public class version1 {
         //number of french teachers
         //index of first french teacher 
         int frenchTeachlb = -1;
-        //change to first sheet numberOfSheets to 1
-        for (int i = 0; i < 1; i++) {
-            Sheet sheetIndex = workbook.getSheetAt(i);
+        
+            Sheet sheetIndex = workbook.getSheetAt(0);
             //getting schedule title
             int rowStart = sheetIndex.getFirstRowNum();
             Row r = sheetIndex.getRow(rowStart);
@@ -70,11 +69,11 @@ public class version1 {
         
             //get teacher names, allocation, and fte 
             //index of start of teacher matrix
-            int teacher_matrix_start = 6;
+            int teacher_matrix_start = 8;
             //teacher name col
-            int teacher_name_row = 0;
+            int teacher_name_col = 0;
             //fulltime col
-            int full_time_row = 3;
+            int full_time_col = 3;
             //teacher allocation row
             int teacher_allocation_row = 9;
             //french certification col
@@ -84,10 +83,10 @@ public class version1 {
 
             
             //interate over two rows at a time 
-            int j = teacher_matrix_start; 
-            String teacherName = sheetIndex.getRow(j).getCell(teacher_name_row).getStringCellValue();
+            int q = teacher_matrix_start; 
+            String teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
             while(teacherName != ""){
-            		Row currRow = sheetIndex.getRow(j);
+            		Row currRow = sheetIndex.getRow(q);
             		boolean fullTime = false;
             		
             		//alternating signal if it is the first row of a teacher
@@ -101,10 +100,10 @@ public class version1 {
             			 switch (currCell.getCellType()) {
             			 	case STRING:
             			 		String cell = currCell.getStringCellValue();
-            			 		if(k == teacher_name_row) {
+            			 		if(k == teacher_name_col) {
                                	 teacherNames.add(currCell.getStringCellValue());
                                 }
-            			 		if (k == full_time_row) {
+            			 		if (k == full_time_col) {
             			 			
             			 			if (cell.matches("(.*)x(.*)") ) {
             			 				//assign full time
@@ -143,35 +142,36 @@ public class version1 {
             			 		} 	
             			 }
             		}
-            		int day1 = 4;
-            		int day5 = 8;
+            		//collecting the available allocated timeslot for part time teachers
+            		int day1_col = 4;
+            		int day5_col = 8;
             		if (fullTime == false) {
             			int[] allocation_times = new int[30]; 
-            			int a_pointer = 0;
+            			int timeslot = 0;
             			//iterate over column then row
-            			for(int col = day1;  col <= day5; col++) {
-            				for(int row = j; row < j+2 ; row++) {
+            			for(int col = day1_col;  col <= day5_col; col++) {
+            				for(int row = q; row < q+2 ; row++) {
             					Row smallRow = sheetIndex.getRow(row);
             					String m = smallRow.getCell(col).getStringCellValue();
             					if (m.matches("(.*)x(.*)") ) {
-            						allocation_times[a_pointer] = 1;
-            						allocation_times[a_pointer+1] = 1;
-            						allocation_times[a_pointer+2] = 1;
+            						allocation_times[timeslot] = 1;
+            						allocation_times[timeslot+1] = 1;
+            						allocation_times[timeslot+2] = 1;
             					}
-            					a_pointer = a_pointer+3;
+            					timeslot = timeslot+3;
     
             				}
             			}
             			availableTime.add(allocation_times);
             		}
             		
-            		j = j+2;
-            		teacherName = sheetIndex.getRow(j).getCell(teacher_name_row).getStringCellValue();
+            		q = q+2;
+            		teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
 
             }
            n2 = teacherNames.size();
 
-           }
+           
         // end of reading in java
 		
 		
@@ -1509,15 +1509,7 @@ else {
 	System.out.println("Model not solved");
 	cplex.exportModel("lpex1.lp");
 }*/
-System.out.println("N2 "+n2);
-System.out.println("Schedulue Name " + schedule_name);
-System.out.println("teacher name" +teacherNames);
-System.out.println("tacher allocation " +FTE);
-for ( int p = 0; p< availableTime.size();p++) {
-	   	System.out.println("teacher time slot" + Arrays.toString(availableTime.get(p)) );
-}
-System.out.println("french teach lb" +frenchTeachlb);
-System.out.println("fremch num" + frenchNum);
+
 
 }
 	
