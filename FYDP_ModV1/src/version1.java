@@ -1,14 +1,180 @@
 import ilog.concert.*;
 import ilog.cplex.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
+
 public class version1 {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		modelConfig();
 	}
 	
-	public static void modelConfig() {
+	public static void modelConfig() throws IOException {
+	//start of excel read in
+		// write your code here
+        //read
+        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/excel_read_in/Jan-30-Front-End.xlsx";
+        FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        int numberOfSheets = workbook.getNumberOfSheets();
+        ArrayList<String> readData = new ArrayList<String>(0);
+        //number of teachers
+        int n2 = -1;
+        //list of teachers names
+        ArrayList<String> teacherNames = new ArrayList<String>(0);
+        //teacher allocation
+        ArrayList<Double> FTE = new ArrayList<Double>(0);
+        //Name of schedule
+        String schedule_name = "empty";
+
+        //Individual teacher allocation time staple
+        ArrayList<int[]> availableTime = new ArrayList<int[]>();
+        //number of french teachers
+        //index of first french teacher 
+        int first_french_teacher = -1;
+        
+            Sheet sheetIndex = workbook.getSheetAt(0);
+            //getting schedule title
+            int rowStart = sheetIndex.getFirstRowNum();
+            Row r = sheetIndex.getRow(rowStart);
+            int sheetTitleStart = 4; 
+            Cell titlecell = r.getCell(sheetTitleStart);
+            if (titlecell == null || titlecell.getRichStringCellValue().getString() == "") {
+            	Date today = Calendar.getInstance().getTime();
+            		schedule_name = "Generated_Schedule " + today;
+             } else {
+            	 	schedule_name = titlecell.getRichStringCellValue().getString();
+             }
+        
+            //get teacher names, allocation, and fte 
+            //index of start of teacher matrix
+            int teacher_matrix_start = 10;
+            //teacher name col
+            int teacher_name_col = 0;
+            //fulltime col
+            int full_time_col = 3;
+            //teacher allocation row
+            int teacher_allocation_col = 9;
+            //french certification col
+            int french_certification_col = 2;
+            //if teacher is the first french teacher
+            boolean first_french = true;
+
+            
+            //interate over two rows at a time 
+            int q = teacher_matrix_start; 
+            String teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
+            
+            while(teacherName != ""){
+            		Row currRow = sheetIndex.getRow(q);
+            		boolean fullTime = false;
+            		
+            		//alternating signal if it is the first row of a teacher
+            	
+            		//interate over two rows at a time,
+            		//then do a for loop for each two
+            		int lastColumn =  Math.max(currRow.getLastCellNum(), 10);
+            		for (int k = 0; k < lastColumn; k++) {
+            			 Cell currCell = currRow.getCell(k);
+            			 
+            			 switch (currCell.getCellType()) {
+            			 	case STRING:
+            			 		String cell = currCell.getStringCellValue();
+            			 		if(k == teacher_name_col) {
+                               	 teacherNames.add(currCell.getStringCellValue());
+                                }
+            			 		if (k == full_time_col) {
+            			 			
+            			 			if (cell.matches("(.*)x(.*)") ) {
+            			 				//assign full time
+            			 				fullTime = true;
+            			 				//fill with 1s
+            			 				int[] fullTimeTeacher = new int[30];
+            			 				for(int m = 0; m < 30; m++) {
+            			 					fullTimeTeacher[m]=1;
+            		
+            			 				}
+            			 				availableTime.add(fullTimeTeacher);
+            			 			}
+            			 		}
+            			 		if (k == french_certification_col) {
+            			 			if(cell.matches("(.*)x(.*)")) {
+            			 				if(first_french == true) {
+            			 					//Index of first french teacher 
+            			 					first_french_teacher=teacherNames.size() -1 ;
+            			 					
+            			 					first_french = false;
+            			 				}
+            			 			}
+            			 		}
+            			 		break;
+            			 	case NUMERIC:
+            			 		break;
+            			 	case FORMULA:
+            			 		FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            			 		CellValue cellValue = evaluator.evaluate(currCell);
+            			 		if(k==teacher_allocation_col ) {
+            			 			if(fullTime == false) {
+            			 			FTE.add(currCell.getNumericCellValue()/10);
+            			 			}else {
+            			 				FTE.add(1.0);
+            			 			}
+            			 		} 	
+            			 }
+            		}
+            		//collecting the available allocated timeslot for part time teachers
+            		int day1_col = 4;
+            		int day5_col = 8;
+            		if (fullTime == false) {
+            			int[] allocation_times = new int[30]; 
+            			int timeslot = 0;
+            			//iterate over column then row
+            			for(int col = day1_col;  col <= day5_col; col++) {
+            				for(int row = q; row < q+2 ; row++) {
+            					Row smallRow = sheetIndex.getRow(row);
+            					String m = smallRow.getCell(col).getStringCellValue();
+            					if (m.matches("(.*)x(.*)") ) {
+            						allocation_times[timeslot] = 1;
+            						allocation_times[timeslot+1] = 1;
+            						allocation_times[timeslot+2] = 1;
+            					}
+            					timeslot = timeslot+3;
+    
+            				}
+            			}
+            			availableTime.add(allocation_times);
+            		}
+            		
+            		q = q+2;
+            		teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
+
+            }
+           n2 = teacherNames.size();
+           int frenchTeach = n2 - first_french_teacher;
+           int frenchTeachlb = n2 - frenchTeach;
+		
+	 //start of model
 	 //define parameters - subjects
 		int n = 11;
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
@@ -17,12 +183,14 @@ public class version1 {
 		int awaySubject = n-2;
 		
 	//define parameters - teachers
-		int n2 = 16;
-		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
-		int frenchTeachlb = n2-2;
+		//Hardcoded values 
+		
+//		int n2 = 16;
+//		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
+//		int frenchTeachlb = n2-2;
 		int frenchTeachub = n2-1;
-		int frenchTeach = 2;
-		String [] teacherNames;
+//		int frenchTeach = 2;
+//		String [] teacherNames;
 	
 	//define parameters - cohorts
 		int n3 = 13;
@@ -68,29 +236,29 @@ public class version1 {
 		
 	//fill above arrays
 		for (int j = 0; j<n2;j++) {
-			totalTeacherMin[j] = FTE[j]*totalTime;
-			prep[j] = FTE[j]*basePrepTime; //prep time allocation
+			totalTeacherMin[j] = FTE.get(j)*totalTime;
+			prep[j] = FTE.get(j)*basePrepTime; //prep time allocation
 			teachMin[j] = totalTeacherMin[j]-prep[j]; //teaching minute allocation
 		}
 		
 	//available time matrix
-		int [][] availableTime = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
-				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
-				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
-		
+//		int [][] availableTime = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+//		
 	//time periods matrix
 	/*	int [][] availableTime = new int[n2][n4];
 		//fill availableTime matrix
@@ -486,8 +654,8 @@ for(int j=0; j<n2;j++) {
 
 for(int j=0; j<n2;j++) {
 	for(int t=0;t<n4;t++) {
-	
-		cplex.addEq(constr3[j][t],availableTime[j][t]);
+		//was availableTime[j][t]
+		cplex.addEq(constr3[j][t],availableTime.get(j)[t]);
 	}
 }
 
@@ -1181,6 +1349,7 @@ cplex.exportModel("lpex1.lp");
 //tolerance
 cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
 //solve 
+/*
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
@@ -1338,7 +1507,8 @@ if(cplex.solve()) {
 else {
 	System.out.println("Model not solved");
 	cplex.exportModel("lpex1.lp");
-}
+}*/
+
 
 }
 	
@@ -1347,5 +1517,6 @@ else {
 		}
  
 	}
-	
+
+ 	   	
 }
