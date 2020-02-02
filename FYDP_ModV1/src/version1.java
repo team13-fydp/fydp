@@ -122,7 +122,7 @@ public class version1 {
             			 			if(cell.matches("(.*)x(.*)")) {
             			 				if(first_french == true) {
             			 					//Index of first french teacher 
-            			 					first_french_teacher=teacherNames.size();
+            			 					first_french_teacher=teacherNames.size() -1 ;
             			 					
             			 					first_french = false;
             			 				}
@@ -173,7 +173,6 @@ public class version1 {
            n2 = teacherNames.size();
            int frenchTeach = n2 - first_french_teacher;
            int frenchTeachlb = n2 - frenchTeach;
-		
 		
 	 //start of model
 	 //define parameters - subjects
@@ -1518,5 +1517,6 @@ else {
 		}
  
 	}
-	
+
+ 	   	
 }
