@@ -23,7 +23,7 @@ public class version1 {
 	
 	public static void modelConfig() throws IOException {
 
-		String excelFilePath = "Jan-28-Front-End.xlsx";
+		String excelFilePath = "Jan-30-Front-End.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         
         Workbook workbook = new XSSFWorkbook(inputStream);
@@ -134,7 +134,7 @@ public class version1 {
 		for(int i=0; i<subjects; i++) {
 			for(int k=0; k< teachingCohort; k++) {
 				for(int j=0; j<n2; j++) {
-					if(rewards[k][j][i] == 150) {
+					if(rewards[k][j][i] == 300) {
 						//System.out.println(rewards[k][j][i]);
 						System.out.println("hi");
 					}
