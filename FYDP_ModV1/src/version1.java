@@ -34,7 +34,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/excel_read_in/Jan-30-Front-End.xlsx";
+        String excelFilePath = "Jan-30-Front-End.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -174,11 +174,115 @@ public class version1 {
            int frenchTeach = n2 - first_french_teacher;
            int frenchTeachlb = n2 - frenchTeach;
 		
+     // INPUT SHEET 2 ENTRY
+        String sheetName = workbook.getSheetName(1);
+   		
+   		XSSFSheet sheet = (XSSFSheet) workbook.getSheet(sheetName);
+   		
+   		int inputColumn = 0;
+   		
+   		//period preference selection
+   		//declaring rows for step 2
+		int periodTimeStartRow = 2;
+		int periodTimeEndRow = 3;
+		int lengtht[] = new int [30];
+		
+		for(int rowNum = periodTimeStartRow; rowNum <= periodTimeEndRow; rowNum++) {
+			Row row = sheet.getRow(rowNum);
+			String value = row.getCell(inputColumn).getStringCellValue();
+			
+			if(value == "") {
+				//cell is empty
+			}else if(rowNum == periodTimeStartRow) {
+				//first period option selected
+				lengtht = new int[] {60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60};
+			}else {
+				//second period option selected
+				lengtht = new int[] {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
+			}
+		}
+		
+		//Schedule Philosophy
+		//declaring rows for step 3
+		int schedulePStartRow = 7;
+		int schedulePEndRow = 9;
+		int schedInput [] = new int [3];
+		int index = 0;
+		
+		for(int rowNum = schedulePStartRow; rowNum<=schedulePEndRow; rowNum++) {
+			Row row = sheet.getRow(rowNum);
+			//cast cell value as an integer
+			int value = (int) row.getCell(inputColumn).getNumericCellValue();
+
+			//add to array storing all ratings for philosophies 
+			schedInput[index] = value;
+			index +=1;
+		}
+		
+		//Teachers and Classes Value Input
+		//declaring rows for step 4
+		int teachClassStart = 13;
+		int teachClassEnd = 16;
+		int n2Check = 0; //validating number of teachers
+		int frenchTeachCheck = 0; //validating number of French certified teachers
+		int teachingCohort = 0; //number of teaching classes
+		int primary = 0; //number of primary classes
+		
+		for(int rowNum = teachClassStart; rowNum <=teachClassEnd; rowNum++) {
+			Row row = sheet.getRow(rowNum);
+			
+			//cast cell value as an integer
+			int value = (int) row.getCell(inputColumn).getNumericCellValue();
+					
+			if(rowNum ==teachClassStart) {
+				n2Check = value;
+			}else if(rowNum == teachClassStart + 1) {
+				frenchTeachCheck = value;
+			}else if(rowNum == teachClassStart + 2) {
+				teachingCohort = value;
+			}else {
+				primary = value;
+			}
+		}
+		
+		//checking the values entered on Sheet1 vs. Sheet2
+		if (n2 != n2Check) {
+			System.out.println("Number of teachers entered does not match");
+		}if(frenchTeach != frenchTeachCheck) {
+			System.out.println("Number of French Teachers entered does not match");
+		}
+		
+		//declaring rows for step 5
+		int extraTimeStart = 21;
+		int extraTimeEnd = 22;
+		
+		//String to store extra time subject preferences
+		int [] extraTime = new int [2];
+		
+		//resetting index for iterating over the array
+		index = 0;
+		
+		//subject type array
+		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
+
+		
+		for(int rowNum = extraTimeStart; rowNum <= extraTimeEnd; rowNum++) {
+			Row row = sheet.getRow(rowNum);
+			String value = row.getCell(inputColumn).getStringCellValue();
+			
+			for(int i =0; i<subj.length; i++) {
+				if(value.equals(subj[i])) {
+					extraTime[index] = i;
+					index +=1;
+				}
+			}			
+		}
+
 	 //start of model
 	 //define parameters - subjects
-		int n = 11;
-		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
-		int subjects = 9;
+		int n = subj.length;
+		//String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
+		int subjects = subj.length - 2;		
 		int prepSubject = n-1;
 		int awaySubject = n-2;
 		
@@ -194,8 +298,8 @@ public class version1 {
 	
 	//define parameters - cohorts
 		int n3 = 13;
-		int teachingCohort = n3-2;
-		int primaryUb = 3;
+		//int teachingCohort = n3-2;
+		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
 		int frenchNum = teachingCohort-frenchCohortlb;
 		int prepCohort = n3-1;
@@ -306,14 +410,14 @@ public class version1 {
 		}*/
 				
 	//time periods array
-		int timeChoice = 0;
+		/*int timeChoice = 0;
 		int [] lengtht;
 		if (timeChoice==0) {
 			lengtht = new int[] {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
 		}
 		else {
 			lengtht = new int[] {60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,};
-		}
+		}*/
 		
 	//defining initial reward matrix
 		int [][][] rewards = new int [teachingCohort][n2][subjects];
@@ -386,7 +490,7 @@ public class version1 {
 		int numDays = 5;
 		
 		//Number of Primary Classes
-		int primary = primaryUb;
+		//int primary = primaryUb;
 		int blockCount = 15;
 		int blocks = 3;
 		
