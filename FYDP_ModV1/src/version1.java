@@ -408,16 +408,6 @@ public class version1 {
 		for(int c = 0; c<=29;c++) {
 			availableTime[16][c] = 1; 
 		}*/
-				
-	//time periods array
-		/*int timeChoice = 0;
-		int [] lengtht;
-		if (timeChoice==0) {
-			lengtht = new int[] {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
-		}
-		else {
-			lengtht = new int[] {60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,};
-		}*/
 		
 	//defining initial reward matrix
 		int [][][] rewards = new int [teachingCohort][n2][subjects];
