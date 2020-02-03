@@ -277,12 +277,106 @@ public class version1 {
 				}
 			}			
 		}
+		
+		//input sheet 2 part 2
+		Sheet inputSheet2 = workbook.getSheetAt(1);
+        int cohortNameStartRow = 28; 
+        int cohortNameStartCol = 2;
+        int gradeNameStartRow = 29;
+        int gradeNameStartCol  = 2;
+        int subjects = subj.length -2;
+        ArrayList<String> cohortNames = new ArrayList<String>(0);
+        ArrayList<String> gradeNames = new ArrayList<String>(0);
+        double cohortGrade;
+        
+        //read in cohort names and grade names stored as strings
+        for(int k=0; k<teachingCohort; k++) {
+        	if (inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue() == "") {
+        		break;
+        	}
+        	
+	        cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
+	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
+	       	gradeNames.add(String.valueOf(cohortGrade));
+        }
+        
+        if (cohortNames.size() != teachingCohort) {
+        	System.out.println("Number of cohorts entered does not match");
+        }
+		
+        double [][][] rewards = new double [teachingCohort][n2][subjects];
+        int homeRoomTeacherStartRow = 32; 
+        int homeRoomTeacherStartCol = 2;
+        String cellHomeRoomCohort;
+        int homeRoomReward = 300;
+        
+		for(int j=0; j<n2; j++){
+			for(int k=0; k<teachingCohort; k++) {
+				for(int i=0; i<subjects; i++) {
+					cellHomeRoomCohort = inputSheet2.getRow(homeRoomTeacherStartRow+j*2).getCell(homeRoomTeacherStartCol+k).getStringCellValue();
+					
+					if (cellHomeRoomCohort != "") {
+					rewards[k][j][i] = homeRoomReward;
+					}
+			
+				}
+			}
+		} 
+		
+		//input sheet 3- specialty teacher rewards matrix psuedo code
+		
+		Sheet inputSheet3 = workbook.getSheetAt(2);
+		int specialtyTeacherStartRow = 7;
+		int specialtyTeacherCol = 0;
+		int subjectCol = 1;
+		int ratingCol = 2;
+		int cohortStartCol = 6;
+		int numSpecialtyTeach =0;
+		int incr =0;
+		double rating;
+		int specialtyWeight= 50;
+		String specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow).getCell(specialtyTeacherCol).getStringCellValue();
+		while(specialtyTeacherCell != "") {
+			specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow+incr*2).getCell(specialtyTeacherCol).getStringCellValue();
+			incr++;
+		}
+		numSpecialtyTeach = incr-1;
+			
+		String teacherNameSearch;
+		String subjectName;
+		int teacherIndex=0;
+		int subjectIndex =0;
+				
+		for(int j=0; j<numSpecialtyTeach; j++) {
+			teacherNameSearch=  inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(specialtyTeacherCol).getStringCellValue();
+			for(int a=0; a<teacherNames.size(); a++) {
+				if(teacherNameSearch.equals(teacherNames.get(a))) {
+					teacherIndex= a;
+				}
+			}
+				
+			subjectName = inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(subjectCol).getStringCellValue();
+				
+			for(int i=0; i<subj.length-2; i++) {
+				if(subj[i].equals(subjectName)) {
+					subjectIndex = i;
+				}
+			}
+			String cellSpecialtyCohort;
+			rating= inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(ratingCol).getNumericCellValue();
+			for(int k=0; k<teachingCohort; k++) {
+				cellSpecialtyCohort = inputSheet3.getRow(specialtyTeacherStartRow+j*2).getCell(cohortStartCol+k).getStringCellValue();
+				if(!cellSpecialtyCohort.equals("")) {
+					rewards[k][teacherIndex][subjectIndex] = rating*specialtyWeight;
+				}
+			}
+		}
 
 	 //start of model
 	 //define parameters - subjects
 		int n = subj.length;
 		//String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
-		int subjects = subj.length - 2;		
+		//int subjects = subj.length - 2;		
 		int prepSubject = n-1;
 		int awaySubject = n-2;
 		
@@ -308,8 +402,6 @@ public class version1 {
 		//only use these to get the max index of n and n3 to be used for a contraint
 		int cohortRange = n3-1;
 		int subjectRange = n-1;
-		String[] gradeNames;
-		String[] cohortNames;
 		
 	//define parameters - time
 		int n4 = 30;
@@ -410,7 +502,7 @@ public class version1 {
 		}*/
 		
 	//defining initial reward matrix
-		int [][][] rewards = new int [teachingCohort][n2][subjects];
+	/*	int [][][] rewards = new int [teachingCohort][n2][subjects];
 		
 		//fill the initial reward matrix
 		for (int k=0; k<teachingCohort;k++) {
@@ -469,7 +561,7 @@ public class version1 {
 					}
 				}
 			}
-		}
+		}*/
 
 			
 		//misc parameters
