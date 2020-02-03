@@ -34,7 +34,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Jan-30-Front-End.xlsx";
+      /*  String excelFilePath = "Jan-30-Front-End.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -370,30 +370,31 @@ public class version1 {
 					rewards[k][teacherIndex][subjectIndex] = rating*specialtyWeight;
 				}
 			}
-		}
+		}*/
 
 	 //start of model
 	 //define parameters - subjects
+		
+		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
 		int n = subj.length;
-		//String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
-		//int subjects = subj.length - 2;		
+		int subjects = subj.length - 2;		
 		int prepSubject = n-1;
 		int awaySubject = n-2;
 		
 	//define parameters - teachers
 		//Hardcoded values 
 		
-//		int n2 = 16;
-//		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
-//		int frenchTeachlb = n2-2;
+		int n2 = 16;
+		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
+		int frenchTeachlb = n2-2;
 		int frenchTeachub = n2-1;
-//		int frenchTeach = 2;
-//		String [] teacherNames;
+		int frenchTeach = 2;
+		String [] teacherNames;
 	
 	//define parameters - cohorts
 		int n3 = 13;
-		//int teachingCohort = n3-2;
-		int primaryUb = primary;
+		int teachingCohort = n3-2;
+		int primaryUb = 3;
 		int frenchCohortlb = primaryUb;
 		int frenchNum = teachingCohort-frenchCohortlb;
 		int prepCohort = n3-1;
@@ -430,31 +431,42 @@ public class version1 {
 		double [] prep = new double [n2];
 		double [] teachMin = new double [n2];
 		
+	//time periods array
+		int timeChoice = 0;
+		int [] lengtht;
+		if (timeChoice==0) {
+			lengtht = new int[] {40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40,40,60,50,50,60,40};
+		}
+		else {
+			lengtht = new int[] {60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,60,40,50,50,40,60,};
+		}
+		
+		
 	//fill above arrays
 		for (int j = 0; j<n2;j++) {
-			totalTeacherMin[j] = FTE.get(j)*totalTime;
-			prep[j] = FTE.get(j)*basePrepTime; //prep time allocation
+			totalTeacherMin[j] = FTE[j]*totalTime;
+			prep[j] = FTE[j]*basePrepTime; //prep time allocation
 			teachMin[j] = totalTeacherMin[j]-prep[j]; //teaching minute allocation
 		}
 		
 	//available time matrix
-//		int [][] availableTime = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
-//		
+		int [][] availableTime = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+		
 	//time periods matrix
 	/*	int [][] availableTime = new int[n2][n4];
 		//fill availableTime matrix
@@ -502,7 +514,7 @@ public class version1 {
 		}*/
 		
 	//defining initial reward matrix
-	/*	int [][][] rewards = new int [teachingCohort][n2][subjects];
+		int [][][] rewards = new int [teachingCohort][n2][subjects];
 		
 		//fill the initial reward matrix
 		for (int k=0; k<teachingCohort;k++) {
@@ -561,7 +573,7 @@ public class version1 {
 					}
 				}
 			}
-		}*/
+		}
 
 			
 		//misc parameters
@@ -572,7 +584,7 @@ public class version1 {
 		int numDays = 5;
 		
 		//Number of Primary Classes
-		//int primary = primaryUb;
+		int primary = primaryUb;
 		int blockCount = 15;
 		int blocks = 3;
 		
@@ -719,9 +731,9 @@ public class version1 {
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
-					objective.addTerm(-80, v2[k][d]); //science
-					objective.addTerm(-80, v3[k][d]); //gym
-					objective.addTerm(-80, v4[k][d]); //social studies
+					objective.addTerm(-50, v2[k][d]); //science
+					objective.addTerm(-50, v3[k][d]); //gym
+					objective.addTerm(-50, v4[k][d]); //social studies
 				}
 			}
 						
@@ -841,7 +853,7 @@ for(int j=0; j<n2;j++) {
 for(int j=0; j<n2;j++) {
 	for(int t=0;t<n4;t++) {
 		//was availableTime[j][t]
-		cplex.addEq(constr3[j][t],availableTime.get(j)[t]);
+		cplex.addEq(constr3[j][t],availableTime[j][t]);
 	}
 }
 
@@ -1028,7 +1040,7 @@ for(int k = 0; k<teachingCohort; k++){
 	}
 
 for(int k = 0;k<teachingCohort; k++){
-	cplex.addGe(art[k], 40);
+	cplex.addGe(art[k], 80);
 }
 
 //constraint 12, social studies
@@ -1229,28 +1241,6 @@ for(int j=0;j<n2;j++){
 	cplex.addEq(prep4[j], 1);
 	cplex.addEq(prep5[j], 1);	
 }
-
-//slack and surplus variables for prep time dist
-IloLinearNumExpr [][] slack1 = new IloLinearNumExpr [n2][numDays];
-IloLinearNumExpr [][] surplus1 = new IloLinearNumExpr [n2][numDays];
-
-for(int j = 0; j<n2; j++) {
-	for(int d = 0; d<numDays;d++) {
-		slack1[j][d] = cplex.linearNumExpr();
-		surplus1[j][d] = cplex.linearNumExpr();
-		
-		slack1[j][d].addTerm(1, u[j][d]);
-		surplus1[j][d].addTerm(1, v[j][d]);
-	}
-}
-
-for(int j = 0; j<n2; j++) {
-	for(int d = 0; d<numDays;d++) {
-		cplex.addGe(slack1[j][d], 0);
-		cplex.addGe(surplus1[j][d], 0);
-	}
-}
-
 
 //constraint 19, language for primary has to be back to back
 IloLinearNumExpr [][] prilan1 = new IloLinearNumExpr[numDays][primary];
@@ -1494,48 +1484,11 @@ for(int k=0;k<teachingCohort;k++){
 	cplex.addEq(ss5[k], 1);
 }
 
-//slack and surplus variables for sci, gym, social studies even distribution
-IloLinearNumExpr [][] slack3 = new IloLinearNumExpr [teachingCohort][numDays];
-IloLinearNumExpr [][] surplus3 = new IloLinearNumExpr [teachingCohort][numDays];
-IloLinearNumExpr [][] slack2 = new IloLinearNumExpr [teachingCohort][numDays];
-IloLinearNumExpr [][] surplus2 = new IloLinearNumExpr [teachingCohort][numDays];
-IloLinearNumExpr [][] slack4 = new IloLinearNumExpr [teachingCohort][numDays];
-IloLinearNumExpr [][] surplus4 = new IloLinearNumExpr [teachingCohort][numDays];
-
-for(int k = 0; k<teachingCohort; k++) {
-	for(int d = 0; d<numDays;d++) {
-		slack3[k][d] = cplex.linearNumExpr();
-		surplus3[k][d] = cplex.linearNumExpr();
-		slack2[k][d] = cplex.linearNumExpr();
-		surplus2[k][d] = cplex.linearNumExpr();
-		slack4[k][d] = cplex.linearNumExpr();
-		surplus4[k][d] = cplex.linearNumExpr();
-		
-		slack3[k][d].addTerm(1, u3[k][d]);
-		surplus3[k][d].addTerm(1, v3[k][d]);
-		slack2[k][d].addTerm(1, u2[k][d]);
-		surplus2[k][d].addTerm(1, v2[k][d]);
-		slack4[k][d].addTerm(1, u4[k][d]);
-		surplus4[k][d].addTerm(1, v4[k][d]);
-	}
-}
-
-for(int k = 0; k<teachingCohort; k++) {
-	for(int d = 0; d<numDays;d++) {
-		cplex.addGe(slack3[k][d], 0);
-		cplex.addGe(surplus3[k][d], 0);
-		cplex.addGe(slack2[k][d], 0);
-		cplex.addGe(surplus2[k][d], 0);
-		cplex.addGe(slack4[k][d], 0);
-		cplex.addGe(surplus4[k][d], 0);
-	}
-}
-
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 10e-2);
 //solve 
-/*
+
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
@@ -1693,7 +1646,7 @@ if(cplex.solve()) {
 else {
 	System.out.println("Model not solved");
 	cplex.exportModel("lpex1.lp");
-}*/
+}
 
 
 }
