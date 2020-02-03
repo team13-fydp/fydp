@@ -309,7 +309,6 @@ public class version1 {
         int homeRoomTeacherStartCol = 2;
         String cellHomeRoomCohort;
         int homeRoomReward = 300;
-        int count = 0;
         
 		for(int j=0; j<n2; j++){
 			for(int k=0; k<teachingCohort; k++) {
