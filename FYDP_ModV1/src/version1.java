@@ -12,16 +12,28 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
+
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class version1 {
 
@@ -34,7 +46,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Jan-30-Front-End.xlsx";
+        String excelFilePath = "2019_flamborough_feb5.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -311,7 +323,9 @@ public class version1 {
         	System.out.println("Number of cohorts entered does not match");
         }
 		
-        int n3 = cohortNames.size() + 2;
+        cohortNames.add("Away");
+        cohortNames.add("Prep");
+        int n3 = cohortNames.size();
         double [][][] rewards = new double [teachingCohort][n2][subjects];
         int homeRoomTeacherStartRow = 32; 
         int homeRoomTeacherStartCol = 5;
@@ -1432,7 +1446,7 @@ for(int k = 0; k<teachingCohort; k++) {
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 5e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 10e-2);
 //solve 
 
 if(cplex.solve()) {
@@ -1517,6 +1531,68 @@ if(cplex.solve()) {
 		}
 		
 	}
+	
+	//write to excel
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+		 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		 Sheet outputSheet = workbook.createSheet("MasterSchedule" + sdf.format(timestamp));
+	   
+	    
+	    //headers
+		int teacherStartRow = 2;
+	    Row teacherStart = outputSheet.createRow(teacherStartRow);
+	    teacherStart.createCell(0).setCellValue("Teacher");
+	    
+	    Row periodRow = outputSheet.createRow(1);
+	    periodRow.createCell(1).setCellValue("Period");
+	    Row dayRow = outputSheet.createRow(0);
+	    for(int t = 0; t < n4; t++) {
+	   	 periodRow.createCell(t+2).setCellValue(t+1);	 
+	    }
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,2,7));
+	    Cell day1 = CellUtil.createCell(dayRow, 2, "Day 1");
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,8,13));
+	    Cell day2 = CellUtil.createCell(dayRow, 8, "Day 2");
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,14,19));
+	    Cell day3 = CellUtil.createCell(dayRow, 14, "Day 3");
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,20,25));
+	    Cell day4 = CellUtil.createCell(dayRow, 22, "Day 4");
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,26,31));
+	    Cell day5 = CellUtil.createCell(dayRow, 26, "Day 5");
+	    
+	    for(int j=0; j<teacherNames.size(); j++) {
+	   	 if(j==0) {
+	   		 teacherStart.createCell(1).setCellValue(teacherNames.get(j));
+	   	 }
+	   	 else {
+	   		 Row teacherRow = outputSheet.createRow(teacherStartRow + j);
+		    	 teacherRow.createCell(1).setCellValue(teacherNames.get(j));
+	   	 }
+	   	 
+	    }
+	    
+	    int periodStartCol = 2;
+	    for(int j =0; j<n2;j++) {
+	    	Row teacherRow = outputSheet.createRow(teacherStartRow + j);
+	    	for(int t =0; t<n4;t++) {
+	    		for(int i =0;i<n;i++) {
+	    			for(int k=0;k<n3;k++) {
+						if((cplex.getValue(x[i][j][k][t])) >0.5) {
+							teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k) + " / " + subj[i]);
+						}
+	    			}
+	    		}
+	    	}
+	    }
+						
+	    
+	    FileOutputStream fileOut = new FileOutputStream(excelFilePath);
+	    workbook.write(fileOut);
 	
 	System.out.println("Prep Time: ");
 	for(int j=0; j< n2; j++) {
