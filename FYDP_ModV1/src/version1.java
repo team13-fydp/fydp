@@ -293,9 +293,9 @@ public class version1 {
 		//input sheet 2 part 2
 		Sheet inputSheet2 = workbook.getSheetAt(1);
         int cohortNameStartRow = 28; 
-        int cohortNameStartCol = 2;
+        int cohortNameStartCol = 5;
         int gradeNameStartRow = 29;
-        int gradeNameStartCol  = 2;
+        int gradeNameStartCol  = 5;
         int subjects = subj.length -2;
         ArrayList<String> cohortNames = new ArrayList<String>(0);
         ArrayList<String> gradeNames = new ArrayList<String>(0);
@@ -1565,7 +1565,7 @@ if(cplex.solve()) {
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,26,31));
 	    Cell day5 = CellUtil.createCell(dayRow, 26, "Day 5");
 	    
-	    for(int j=0; j<teacherNames.size(); j++) {
+	  /*  for(int j=0; j<teacherNames.size(); j++) {
 	   	 if(j==0) {
 	   		 teacherStart.createCell(1).setCellValue(teacherNames.get(j));
 	   	 }
@@ -1574,16 +1574,26 @@ if(cplex.solve()) {
 		    	 teacherRow.createCell(1).setCellValue(teacherNames.get(j));
 	   	 }
 	   	 
-	    }
+	    }*/
 	    
 	    int periodStartCol = 2;
 	    for(int j =0; j<n2;j++) {
 	    	Row teacherRow = outputSheet.createRow(teacherStartRow + j);
+	    	teacherRow.createCell(1).setCellValue(teacherNames.get(j));
 	    	for(int t =0; t<n4;t++) {
 	    		for(int i =0;i<n;i++) {
 	    			for(int k=0;k<n3;k++) {
 						if((cplex.getValue(x[i][j][k][t])) >0.5) {
-							teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k) + " / " + subj[i]);
+							if(k==n3-1) {
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
+							}
+							else if(k==n3-2) {
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
+							}
+							else {
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k) + " / " + subj[i]);
+							}
+							
 						}
 	    			}
 	    		}
