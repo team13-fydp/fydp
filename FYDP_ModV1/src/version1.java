@@ -295,18 +295,26 @@ public class version1 {
         		break;
         	}
         	
-	        cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
-	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
-	       	gradeNames.add(String.valueOf(cohortGrade));
+        	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
+        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
+        	}
+        	
+        	else {
+        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
+      	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
+      	       	gradeNames.add(String.valueOf(cohortGrade));
+        	}
+        	
         }
         
         if (cohortNames.size() != teachingCohort) {
         	System.out.println("Number of cohorts entered does not match");
         }
 		
+        int n3 = cohortNames.size() + 2;
         double [][][] rewards = new double [teachingCohort][n2][subjects];
         int homeRoomTeacherStartRow = 32; 
-        int homeRoomTeacherStartCol = 2;
+        int homeRoomTeacherStartCol = 5;
         String cellHomeRoomCohort;
         int homeRoomReward = 300;
         
@@ -323,8 +331,6 @@ public class version1 {
 			}
 		} 
 		
-		//input sheet 3- specialty teacher rewards matrix psuedo code
-		
 		Sheet inputSheet3 = workbook.getSheetAt(2);
 		int specialtyTeacherStartRow = 7;
 		int specialtyTeacherCol = 0;
@@ -334,7 +340,7 @@ public class version1 {
 		int numSpecialtyTeach =0;
 		int incr =0;
 		double rating;
-		int specialtyWeight= 50;
+		int specialtyWeight= 10;
 		String specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow).getCell(specialtyTeacherCol).getStringCellValue();
 		while(specialtyTeacherCell != "") {
 			specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow+incr*2).getCell(specialtyTeacherCol).getStringCellValue();
@@ -371,6 +377,7 @@ public class version1 {
 				}
 			}
 		}
+			
 
 	 //start of model
 	 //define parameters - subjects
@@ -386,13 +393,12 @@ public class version1 {
 //		int n2 = 16;
 //		double [] FTE = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.2,0.6,0.2,1.0,1.0};
 //		int frenchTeachlb = n2-2;
-		int frenchTeachub = n2-1;
 //		int frenchTeach = 2;
-//		String [] teacherNames;
 	
 	//define parameters - cohorts
-		int n3 = 13;
+		//int n3 = 13;
 		//int teachingCohort = n3-2;
+		//int primary = 3;
 		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
 		int frenchNum = teachingCohort-frenchCohortlb;
@@ -448,122 +454,15 @@ public class version1 {
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
-//				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
-//				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+//				1{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
+//				2{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0},
+//				3{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+//				4{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1},
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
 //		
-	//time periods matrix
-	/*	int [][] availableTime = new int[n2][n4];
-		//fill availableTime matrix
 		
-		//first nine rows are 1
-		for(int a = 0; a<=3;a++) {
-			for(int b=0;b<=29;b++) {
-				availableTime[a][b]=1;
-			}
-		}
-		
-		for(int c=0;c<=20;c++) {
-			availableTime[4][c]=1;
-		}
-		
-		for(int a = 5; a<=10;a++) {
-			for(int b=0;b<=29;b++) {
-				availableTime[a][b]=1;
-			}
-		}
-		
-		for(int c=24;c<=29;c++) {
-			availableTime[11][c]=1;
-		}
-		
-		for(int c = 18; c<=23;c++) {
-			availableTime[12][c] = 1;
-		}
-		
-		for(int c = 0; c<=8;c++) {
-			availableTime[13][c] = 1; 
-		}
-		for(int c = 21; c<=29;c++) {
-			availableTime[13][c] = 1; 
-		}
-		
-		for(int c = 0; c<=5;c++) {
-			availableTime[14][c] = 1; 
-		}
-		for(int c = 0; c<=8;c++) {
-			availableTime[15][c] = 1; 
-		}
-		for(int c = 0; c<=29;c++) {
-			availableTime[16][c] = 1; 
-		}*/
-		
-	//defining initial reward matrix
-	/*	int [][][] rewards = new int [teachingCohort][n2][subjects];
-		
-		//fill the initial reward matrix
-		for (int k=0; k<teachingCohort;k++) {
-			for(int j=0;j<n2;j++) {
-				for(int i=0;i<subjects;i++) {
-					if(k==0 && j==0) {
-						rewards[k][j][i]=100;
-					}else if (k==1 && j==1) {
-						rewards[k][j][i] = 100;		
-					}else if (k==2 && j==2) {
-						rewards[k][j][i] = 100;
-					}else if (k==3 && j==3) {
-						rewards[k][j][i] = 100;
-					}else if ( k==4 && j==4 && (i==3 || i==1)) {
-						rewards[k][j][i] = 200;
-					}else if((k>=2 && k<=5) && j==4 && i==6) {
-						rewards[k][j][i] =200;
-					}else if((k>=3 && k<=5) && j==5 && (i!=1 && i<=4)) {
-						rewards[k][j][i] = 100;
-					}else if((k>=3 && k<=5) && j ==6 &&i ==4) {
-						rewards[k][j][i] = 100;
-					}else if(k==6 & j==6 && ( i!= 2 && i<=5)) {
-						rewards[k][j][i] = 100;
-					}else if(k==0 & j ==6) {
-						rewards[k][j][i] = 10;
-					}else if(k==7 && j==7 && (( i==1) || i==0 || i ==3 || i==5)) {
-						rewards[k][j][i] = 10;
-					}else if ((k>=0 && k<=2) && j==7 && i==5) {
-						rewards[k][j][i] = 10;
-					}else if(k==8 && j ==8 && i<=2) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=2) && j==8 && i==5) {
-						rewards[k][j][i]=10;
-					}else if(k==9 && j==9 && i!= 4) {
-						rewards[k][j][i] = 100;
-					}else if((k>=8 && k<=10) && j==10 && i==4) {
-						rewards[k][j][i] = 10;
-					}else if(k==3 && j==9 && i==3) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=3) && j==11) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=2) && j==12) {
-						rewards[k][j][i] = 10;
-					}else if((k>=3 && k<=10) && j==13 && i==3) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=10) && j==13 && i==3) {
-						rewards[k][j][i]=200;
-					}else if((k>=3 && k<=6) && j==14 && i==4) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=6) && j== 14 && i==3) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=6) && j==15 && i==6) {
-						rewards[k][j][i] = 200;
-					}else if((k>=6 && k<=10) && j==16 && i==6) {
-						rewards[k][j][i] = 200;
-					}
-				}
-			}
-		}*/
-
-			
+	
 		//misc parameters
 		int pjd = 50; //penalty value
 		int gymCap = 2;
@@ -719,9 +618,9 @@ public class version1 {
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
-					objective.addTerm(-80, v2[k][d]); //science
-					objective.addTerm(-80, v3[k][d]); //gym
-					objective.addTerm(-80, v4[k][d]); //social studies
+					objective.addTerm(-50, v2[k][d]); //science
+					objective.addTerm(-50, v3[k][d]); //gym
+					objective.addTerm(-50, v4[k][d]); //social studies
 				}
 			}
 						
@@ -1533,9 +1432,9 @@ for(int k = 0; k<teachingCohort; k++) {
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 5e-2);
 //solve 
-/*
+
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
@@ -1693,7 +1592,7 @@ if(cplex.solve()) {
 else {
 	System.out.println("Model not solved");
 	cplex.exportModel("lpex1.lp");
-}*/
+}
 
 
 }
