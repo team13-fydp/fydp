@@ -331,9 +331,6 @@ public class version1 {
 			}
 		} 
 		
-		System.out.println(rewards[0][0][0]);
-		//input sheet 3- specialty teacher rewards matrix 
-		
 		Sheet inputSheet3 = workbook.getSheetAt(2);
 		int specialtyTeacherStartRow = 7;
 		int specialtyTeacherCol = 0;
@@ -380,35 +377,11 @@ public class version1 {
 				}
 			}
 		}
-		
-	//test to make sure all of the input filled the varaibles properly
-		System.out.println("subjects: " + subjects);
-		System.out.println("n2: " + n2);
-		System.out.println("frenchTeachlb: " + frenchTeachlb);
-		System.out.println("frenchTeach: " + frenchTeach);
-		
-		System.out.print("FTE: ");
-		for(int i=0; i<FTE.size(); i++) {
-			System.out.print(FTE.get(i) + ", ");
-		}
-		System.out.println();
-		System.out.println("n3: " + n3);
-		System.out.println("teachingCohort: " + teachingCohort);
-		System.out.println("primary: " + primary);
-		
-		for (int i=0; i<availableTime.size(); i++){
-		    int[] tmp = availableTime.get(i);
-		    for (int j=0; j<tmp.length; j++) {
-		         System.out.print(tmp[j] + ", ");
-		    }
-		    System.out.println();
-		}
-		
+			
 
 	 //start of model
 	 //define parameters - subjects
 		int n = subj.length;
-		System.out.println("n: " + n);
 		//String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
 		//int subjects = subj.length - 2;		
 		int prepSubject = n-1;
@@ -489,69 +462,7 @@ public class version1 {
 //				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
 //		
 		
-	//defining initial reward matrix
-	/*	int [][][] rewards = new int [teachingCohort][n2][subjects];
-		
-		//fill the initial reward matrix
-		for (int k=0; k<teachingCohort;k++) {
-			for(int j=0;j<n2;j++) {
-				for(int i=0;i<subjects;i++) {
-					if(k==0 && j==0) {
-						rewards[k][j][i]=100;
-					}else if (k==1 && j==1) {
-						rewards[k][j][i] = 100;		
-					}else if (k==2 && j==2) {
-						rewards[k][j][i] = 100;
-					}else if (k==3 && j==3) {
-						rewards[k][j][i] = 100;
-					}else if ( k==4 && j==4 && (i==3 || i==1)) {
-						rewards[k][j][i] = 200;
-					}else if((k>=2 && k<=5) && j==4 && i==6) {
-						rewards[k][j][i] =200;
-					}else if((k>=3 && k<=5) && j==5 && (i!=1 && i<=4)) {
-						rewards[k][j][i] = 100;
-					}else if((k>=3 && k<=5) && j ==6 &&i ==4) {
-						rewards[k][j][i] = 100;
-					}else if(k==6 & j==6 && ( i!= 2 && i<=5)) {
-						rewards[k][j][i] = 100;
-					}else if(k==0 & j ==6) {
-						rewards[k][j][i] = 10;
-					}else if(k==7 && j==7 && (( i==1) || i==0 || i ==3 || i==5)) {
-						rewards[k][j][i] = 10;
-					}else if ((k>=0 && k<=2) && j==7 && i==5) {
-						rewards[k][j][i] = 10;
-					}else if(k==8 && j ==8 && i<=2) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=2) && j==8 && i==5) {
-						rewards[k][j][i]=10;
-					}else if(k==9 && j==9 && i!= 4) {
-						rewards[k][j][i] = 100;
-					}else if((k>=8 && k<=10) && j==10 && i==4) {
-						rewards[k][j][i] = 10;
-					}else if(k==3 && j==9 && i==3) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=3) && j==11) {
-						rewards[k][j][i] = 10;
-					}else if((k>=0 && k<=2) && j==12) {
-						rewards[k][j][i] = 10;
-					}else if((k>=3 && k<=10) && j==13 && i==3) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=10) && j==13 && i==3) {
-						rewards[k][j][i]=200;
-					}else if((k>=3 && k<=6) && j==14 && i==4) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=6) && j== 14 && i==3) {
-						rewards[k][j][i] = 200;
-					}else if((k>=3 && k<=6) && j==15 && i==6) {
-						rewards[k][j][i] = 200;
-					}else if((k>=6 && k<=10) && j==16 && i==6) {
-						rewards[k][j][i] = 200;
-					}
-				}
-			}
-		}*/
-
-			
+	
 		//misc parameters
 		int pjd = 50; //penalty value
 		int gymCap = 2;
@@ -1016,7 +927,7 @@ for(int k = 0; k<teachingCohort; k++){
 	}
 
 for(int k = 0;k<teachingCohort; k++){
-	cplex.addGe(art[k], 80);
+	cplex.addGe(art[k], 40);
 }
 
 //constraint 12, social studies
@@ -1096,7 +1007,7 @@ for(int k=0;k<teachingCohort;k++){
 	}
 
 for(int k=0;k<teachingCohort;k++){
-	cplex.addGe(music[k], 80);
+	cplex.addGe(music[k], 40);
 }
 
 //constraint 21, drama
