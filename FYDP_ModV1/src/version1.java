@@ -269,8 +269,8 @@ public class version1 {
 	        cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
 	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
 	       	gradeNames.add(String.valueOf(cohortGrade));
+	       
         }
-        
         
 		
         double [][][] rewards = new double [teachingCohortCountPage2][n2][subjects];
@@ -309,30 +309,15 @@ public class version1 {
 		int primary = 0; //number of primary classes
 		int classesCountStart = 3;
 		int classesCountEnd  = 4;
-		int alternativeColumn = 8;
 		
-		System.out.println(title);
 		for(int rowNum = classesCountStart; rowNum <=classesCountEnd; rowNum++) {
-			Row row2 = sheet.getRow(rowNum);
-			System.out.println("rownum = "+ rowNum);
-			System.out.println(inputColumn);
-			for(int t = 0; t < 11; t+=2) {
-				System.out.println("case type of column " + t +" is " + row2.getCell(t).getCellType());
-			}
-			//System.out.println("case type " + row2.getCell(inputColumn).getCellType());
-			
-			
+			Row row2 = inputSheet3.getRow(rowNum);
 			//cast cell value as an integer
-			if(row2.getCell(inputColumn).getNumericCellValue() == 0) {
-				System.out.println("is 0");
-				break;
-				
-			}
-			
 			int value = (int) row2.getCell(inputColumn).getNumericCellValue();
 					
 			if(rowNum ==classesCountStart) {
 				teachingCohort = value;
+
 			}else {
 				primary = value;
 			}
