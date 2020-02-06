@@ -34,7 +34,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Master-Excel-Front-End.xlsx";
+        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/java_fypd/fydp/FYDP_ModV1/Master-Excel-Front-End.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -205,8 +205,8 @@ public class version1 {
 		//Schedule Philosophy
 		//declaring rows for step 3
 		int schedulePStartRow = 7;
-		int schedulePEndRow = 9;
-		int schedInput [] = new int [3];
+		int schedulePEndRow = 8;
+		int schedInput [] = new int [2];
 		int index = 0;
 		
 		for(int rowNum = schedulePStartRow; rowNum<=schedulePEndRow; rowNum++) {
@@ -219,42 +219,9 @@ public class version1 {
 			index +=1;
 		}
 		
-		//Teachers and Classes Value Input
-		//declaring rows for step 4
-		int teachClassStart = 13;
-		int teachClassEnd = 16;
-		int n2Check = 0; //validating number of teachers
-		int frenchTeachCheck = 0; //validating number of French certified teachers
-		int teachingCohort = 0; //number of teaching classes
-		int primary = 0; //number of primary classes
-		
-		for(int rowNum = teachClassStart; rowNum <=teachClassEnd; rowNum++) {
-			Row row = sheet.getRow(rowNum);
-			
-			//cast cell value as an integer
-			int value = (int) row.getCell(inputColumn).getNumericCellValue();
-					
-			if(rowNum ==teachClassStart) {
-				n2Check = value;
-			}else if(rowNum == teachClassStart + 1) {
-				frenchTeachCheck = value;
-			}else if(rowNum == teachClassStart + 2) {
-				teachingCohort = value;
-			}else {
-				primary = value;
-			}
-		}
-		
-		//checking the values entered on Sheet1 vs. Sheet2
-		if (n2 != n2Check) {
-			System.out.println("Number of teachers entered does not match");
-		}if(frenchTeach != frenchTeachCheck) {
-			System.out.println("Number of French Teachers entered does not match");
-		}
-		
 		//declaring rows for step 5
-		int extraTimeStart = 21;
-		int extraTimeEnd = 22;
+		int extraTimeStart = 18;
+		int extraTimeEnd = 19;
 		
 		//String to store extra time subject preferences
 		int [] extraTime = new int [2];
@@ -280,17 +247,21 @@ public class version1 {
 		
 		//input sheet 2 part 2
 		Sheet inputSheet2 = workbook.getSheetAt(1);
-        int cohortNameStartRow = 28; 
+        int cohortNameStartRow = 25; 
         int cohortNameStartCol = 2;
-        int gradeNameStartRow = 29;
+        int gradeNameStartRow = 26;
         int gradeNameStartCol  = 2;
         int subjects = subj.length -2;
         ArrayList<String> cohortNames = new ArrayList<String>(0);
         ArrayList<String> gradeNames = new ArrayList<String>(0);
         double cohortGrade;
+        int teachingCohortCountPage2 = 0;
+        while (inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol + teachingCohortCountPage2).getStringCellValue() != "") {
+        		teachingCohortCountPage2++;
+        }
         
         //read in cohort names and grade names stored as strings
-        for(int k=0; k<teachingCohort; k++) {
+        for(int k=0; k<teachingCohortCountPage2; k++) {
         	if (inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue() == "") {
         		break;
         	}
@@ -298,20 +269,18 @@ public class version1 {
 	        cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
 	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
 	       	gradeNames.add(String.valueOf(cohortGrade));
+	       
         }
         
-        if (cohortNames.size() != teachingCohort) {
-        	System.out.println("Number of cohorts entered does not match");
-        }
 		
-        double [][][] rewards = new double [teachingCohort][n2][subjects];
+        double [][][] rewards = new double [teachingCohortCountPage2][n2][subjects];
         int homeRoomTeacherStartRow = 32; 
         int homeRoomTeacherStartCol = 2;
         String cellHomeRoomCohort;
         int homeRoomReward = 300;
         
 		for(int j=0; j<n2; j++){
-			for(int k=0; k<teachingCohort; k++) {
+			for(int k=0; k<teachingCohortCountPage2; k++) {
 				for(int i=0; i<subjects; i++) {
 					cellHomeRoomCohort = inputSheet2.getRow(homeRoomTeacherStartRow+j*2).getCell(homeRoomTeacherStartCol+k).getStringCellValue();
 					
@@ -323,10 +292,11 @@ public class version1 {
 			}
 		} 
 		
-		//input sheet 3- specialty teacher rewards matrix psuedo code
-		
+		//input sheet 3- specialty teacher rewards matrix psuedo code and number of classes 
+		//started pulling in an earlier sheet 
 		Sheet inputSheet3 = workbook.getSheetAt(2);
-		int specialtyTeacherStartRow = 7;
+		String title = inputSheet3.getSheetName();
+		int specialtyTeacherStartRow = 12;
 		int specialtyTeacherCol = 0;
 		int subjectCol = 1;
 		int ratingCol = 2;
@@ -335,6 +305,25 @@ public class version1 {
 		int incr =0;
 		double rating;
 		int specialtyWeight= 50;
+		int teachingCohort = 0; //number of teaching classes
+		int primary = 0; //number of primary classes
+		int classesCountStart = 3;
+		int classesCountEnd  = 4;
+		
+		for(int rowNum = classesCountStart; rowNum <=classesCountEnd; rowNum++) {
+			Row row2 = inputSheet3.getRow(rowNum);
+			//cast cell value as an integer
+			int value = (int) row2.getCell(inputColumn).getNumericCellValue();
+					
+			if(rowNum ==classesCountStart) {
+				teachingCohort = value;
+
+			}else {
+				primary = value;
+			}
+		}
+		
+		
 		String specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow).getCell(specialtyTeacherCol).getStringCellValue();
 		while(specialtyTeacherCell != "") {
 			specialtyTeacherCell =  inputSheet3.getRow(specialtyTeacherStartRow+incr*2).getCell(specialtyTeacherCol).getStringCellValue();
