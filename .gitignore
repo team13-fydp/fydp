@@ -124,3 +124,8 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/java,macos,eclipse
+
+#team 13 model stuff
+.lp
+.class
+FYDP_ModV1/testing_doc.txt
