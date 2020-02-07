@@ -34,7 +34,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/java_fypd/fydp/FYDP_ModV1/Master-Excel-Front-End.xlsx";
+        String excelFilePath = "Master-Excel-Front-End.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -266,15 +266,21 @@ public class version1 {
         		break;
         	}
         	
-	        cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
-	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
-	       	gradeNames.add(String.valueOf(cohortGrade));
+        	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
+        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
+        	}
+
+        	else {
+        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
+      	       	cohortGrade= inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getNumericCellValue(); 
+      	       	gradeNames.add(String.valueOf(cohortGrade));
+        	}
 	       
         }
         
 		
         double [][][] rewards = new double [teachingCohortCountPage2][n2][subjects];
-        int homeRoomTeacherStartRow = 32; 
+        int homeRoomTeacherStartRow = 29; 
         int homeRoomTeacherStartCol = 2;
         String cellHomeRoomCohort;
         int homeRoomReward = 300;
@@ -296,7 +302,7 @@ public class version1 {
 		//started pulling in an earlier sheet 
 		Sheet inputSheet3 = workbook.getSheetAt(2);
 		String title = inputSheet3.getSheetName();
-		int specialtyTeacherStartRow = 12;
+		int specialtyTeacherStartRow = 13;
 		int specialtyTeacherCol = 0;
 		int subjectCol = 1;
 		int ratingCol = 2;
@@ -304,7 +310,7 @@ public class version1 {
 		int numSpecialtyTeach =0;
 		int incr =0;
 		double rating;
-		int specialtyWeight= 50;
+		int specialtyWeight= 10;
 		int teachingCohort = 0; //number of teaching classes
 		int primary = 0; //number of primary classes
 		int classesCountStart = 3;
@@ -360,7 +366,7 @@ public class version1 {
 				}
 			}
 		}
-
+		
 	 //start of model
 	 //define parameters - subjects
 		int n = subj.length;
@@ -380,7 +386,7 @@ public class version1 {
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
-		int n3 = 13;
+		int n3 = cohortNames.size() + 2;
 		//int teachingCohort = n3-2;
 		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
@@ -708,9 +714,9 @@ public class version1 {
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
-					objective.addTerm(-80, v2[k][d]); //science
-					objective.addTerm(-80, v3[k][d]); //gym
-					objective.addTerm(-80, v4[k][d]); //social studies
+					objective.addTerm(-50, v2[k][d]); //science
+					objective.addTerm(-50, v3[k][d]); //gym
+					objective.addTerm(-50, v4[k][d]); //social studies
 				}
 			}
 						
@@ -1522,9 +1528,9 @@ for(int k = 0; k<teachingCohort; k++) {
 
 cplex.exportModel("lpex1.lp");
 //tolerance
-cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 4.5e-2);
+cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 5e-2);
 //solve 
-/*
+
 if(cplex.solve()) {
 
 	System.out.println("Objective = "+cplex.getObjValue());
@@ -1682,7 +1688,7 @@ if(cplex.solve()) {
 else {
 	System.out.println("Model not solved");
 	cplex.exportModel("lpex1.lp");
-}*/
+}
 
 
 }
