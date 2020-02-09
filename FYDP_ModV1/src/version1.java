@@ -34,7 +34,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Master-Excel-Front-End.xlsx";
+        String excelFilePath = "flamborough_feb6.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -387,6 +387,8 @@ public class version1 {
 	
 	//define parameters - cohorts
 		int n3 = cohortNames.size() + 2;
+        cohortNames.add("Away");
+        cohortNames.add("Prep");
 		//int teachingCohort = n3-2;
 		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
@@ -1613,6 +1615,53 @@ if(cplex.solve()) {
 		}
 		
 	}
+	
+	//output to Excel
+	Sheet Outsheet = workbook.getSheetAt(3);
+	
+	
+	int beginRowIndex = 1;
+	int beginColumn = 0;
+	//create Row
+	
+	for(int t=0; t<n4; t++) {
+		for(int i=0;i<n;i++) {
+			for(int j=0;j<n2;j++) {
+				for(int k=0;k<n3;k++) {
+							if ((cplex.getValue(x[i][j][k][t])) > 0.5) {
+								Row beginRow = Outsheet.createRow(++beginRowIndex);
+								beginRow.createCell(beginColumn).setCellValue(teacherNames.get(j));
+								beginRow.createCell(beginColumn + 1).setCellValue(cohortNames.get(k));
+								beginRow.createCell(beginColumn + 2).setCellValue(subj[i]);
+
+								if (t == 0 || t == 1 || t == 2 || t == 3 || t == 4 || t == 5) {
+									beginRow.createCell(beginColumn + 3).setCellValue("Day 1");
+									beginRow.createCell(beginColumn + 4).setCellValue(t+1);
+								} else if (t == 6 || t == 7 || t == 8 || t == 9 || t == 10 || t == 11) {
+									beginRow.createCell(beginColumn + 3).setCellValue("Day 2");
+									beginRow.createCell(beginColumn + 4).setCellValue(t-5);
+								} else if (t == 12 || t == 13 || t == 14 || t == 15 || t == 16 || t == 17) {
+									beginRow.createCell(beginColumn + 3).setCellValue("Day 3");
+									beginRow.createCell(beginColumn + 4).setCellValue(t-11);
+								} else if (t == 18 || t == 19 || t == 20 || t == 21 || t == 22 || t == 23) {
+									beginRow.createCell(beginColumn + 3).setCellValue("Day 4");
+									beginRow.createCell(beginColumn + 4).setCellValue(t-17);
+								} else {
+									beginRow.createCell(beginColumn + 3).setCellValue("Day 5");
+									beginRow.createCell(beginColumn + 4).setCellValue(t-23);
+								}
+							}
+						}
+				
+				
+			}
+		}
+	}
+
+
+    FileOutputStream fileOut = new FileOutputStream(excelFilePath);
+    workbook.write(fileOut);
+
 	
 	System.out.println("Prep Time: ");
 	for(int j=0; j< n2; j++) {
