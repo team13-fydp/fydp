@@ -20,10 +20,14 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -34,6 +38,18 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.hssf.usermodel.*;
 
 public class version1 {
 
@@ -48,6 +64,7 @@ public class version1 {
         //read
         String excelFilePath = "2019_flamborough_feb5.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+        
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
         ArrayList<String> readData = new ArrayList<String>(0);
@@ -1536,8 +1553,7 @@ if(cplex.solve()) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
 		 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		 Sheet outputSheet = workbook.createSheet("MasterSchedule" + sdf.format(timestamp));
-	   
-	    
+		 	    
 	    //headers
 		int teacherStartRow = 2;
 	    Row teacherStart = outputSheet.createRow(teacherStartRow);
@@ -1545,26 +1561,94 @@ if(cplex.solve()) {
 	    
 	    Row periodRow = outputSheet.createRow(1);
 	    periodRow.createCell(1).setCellValue("Period");
-	    Row dayRow = outputSheet.createRow(0);
+	  	    Row dayRow = outputSheet.createRow(0);
 	    for(int t = 0; t < n4; t++) {
 	   	 periodRow.createCell(t+2).setCellValue(t+1);	 
 	    }
 	    
+	    /*
+	    //set style for cells
+	    CellStyle cs = workbook.createCellStyle();
+		 //wrap text in cells
+		cs.setWrapText(true);  
+		
+		
+		
+		
+			row.setRowStyle(createCellStyle());
+      //   row.getRowStyle().getFont().setBold(true); */
+	    
+	    
+	    Row row=sheet.getRow(3);
+	    Cell cell = row.createCell(3);
+	    
+	    CellStyle style=null;
+
+	    XSSFFont defaultFont= (XSSFFont) workbook.createFont();
+	    
+	    defaultFont.setFontHeightInPoints((short)10);
+	    defaultFont.setFontName("Arial");
+	    defaultFont.setColor(IndexedColors.BLACK.getIndex());
+	    defaultFont.setBold(false);
+	    defaultFont.setItalic(false);
+
+	    XSSFFont font= (XSSFFont) workbook.createFont();
+	    font.setFontHeightInPoints((short)10);
+	    font.setFontName("Arial");
+	    font.setColor(IndexedColors.BLACK.getIndex());
+	    font.setBold(true);
+	    font.setItalic(false);
+	    
+	  /* 
+	    style=row.getRowStyle();
+	    style.setWrapText(true);
+	  // style.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex()); */
+	    
+	    CellStyle cs = workbook.createCellStyle();
+	    cs.setWrapText(true);   
+	    cell.setCellStyle(cs);
+	    
+	    /*
+	    style.setFillBackgroundColor(IndexedColors.DARK_BLUE.getIndex());
+	    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	    style.setAlignment(CellStyle.ALIGN_CENTER); 
+	    style.setFont(font);
+	        
+	    Row row= outputSheet.getRow(0);
+		CellStyle style=null; 
+		
+		style=row.getRowStyle();
+		 */
+	    CellStyle cellStyle = row.getSheet().getWorkbook().createCellStyle();
+	    cellStyle.setWrapText(true);
+			        
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,2,7));
 	    Cell day1 = CellUtil.createCell(dayRow, 2, "Day 1");
-	    
+	      
+	    CellUtil.setAlignment(day1, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day1,font);
+	    //CellUtil.setCellStyleProperties(day1,setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex()) );
+		    
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,8,13));
 	    Cell day2 = CellUtil.createCell(dayRow, 8, "Day 2");
+	    CellUtil.setAlignment(day2, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day2,font);
 	    
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,14,19));
 	    Cell day3 = CellUtil.createCell(dayRow, 14, "Day 3");
+	    CellUtil.setAlignment(day3, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day3,font);
 	    
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,20,25));
-	    Cell day4 = CellUtil.createCell(dayRow, 22, "Day 4");
+	    Cell day4 = CellUtil.createCell(dayRow, 20, "Day 4");
+	    CellUtil.setAlignment(day4, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day4,font);
 	    
 	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,26,31));
 	    Cell day5 = CellUtil.createCell(dayRow, 26, "Day 5");
-	    
+	    CellUtil.setAlignment(day5, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day5,font); // this should bold it
+		    
 	  /*  for(int j=0; j<teacherNames.size(); j++) {
 	   	 if(j==0) {
 	   		 teacherStart.createCell(1).setCellValue(teacherNames.get(j));
@@ -1574,7 +1658,7 @@ if(cplex.solve()) {
 		    	 teacherRow.createCell(1).setCellValue(teacherNames.get(j));
 	   	 }
 	   	 
-	    }*/
+	    }*/  
 	    
 	    int periodStartCol = 2;
 	    for(int j =0; j<n2;j++) {
@@ -1585,13 +1669,19 @@ if(cplex.solve()) {
 	    			for(int k=0;k<n3;k++) {
 						if((cplex.getValue(x[i][j][k][t])) >0.5) {
 							if(k==n3-1) {
-								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));	
+								cellStyle.setAlignment(HorizontalAlignment.CENTER);
 							}
 							else if(k==n3-2) {
 								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
 							}
 							else {
 								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k) + " / " + subj[i]);
+								cellStyle.setWrapText(true);
+								teacherRow.setRowStyle(cellStyle);
+								//((Cell) teacherRow).setCellStyle(cs);
+								//((CellStyle) teacherRow.createCell(periodStartCol+t)).setWrapText(true);
+								
 							}
 							
 						}
@@ -1599,6 +1689,8 @@ if(cplex.solve()) {
 	    		}
 	    	}
 	    }
+	    
+	    setCellStyle(workbook,outputSheet,cellStyle=cs);
 						
 	    
 	    FileOutputStream fileOut = new FileOutputStream(excelFilePath);
@@ -1687,6 +1779,11 @@ else {
 			exc.printStackTrace();
 		}
  
+	}
+
+	private static void setCellStyle(Workbook workbook, Sheet outputSheet, CellStyle cellStyle) {
+		// TODO Auto-generated method stub
+		
 	}
 
  	   	
