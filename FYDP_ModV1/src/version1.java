@@ -35,7 +35,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Master-Excel-Front-End.xlsx";
+        String excelFilePath = "orgA_feb10.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -269,6 +269,7 @@ public class version1 {
         	
         	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
         		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
+        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
         	}
 
         	else {
@@ -279,7 +280,7 @@ public class version1 {
 	       
         }
         
-		
+		System.out.print("test" + subjects);
         double [][][] rewards = new double [teachingCohortCountPage2][n2][subjects];
         int homeRoomTeacherStartRow = 29; 
         int homeRoomTeacherStartCol = 2;
@@ -376,6 +377,37 @@ public class version1 {
 		int prepSubject = n-1;
 		int awaySubject = n-2;
 		
+		System.out.println("subjects: " + subjects);
+		System.out.println("n2: " + n2);
+		System.out.println("frenchTeachlb: " + frenchTeachlb);
+		System.out.println("frenchTeach: " + frenchTeach);
+		
+		System.out.print("FTE: ");
+		for(int i=0; i<FTE.size(); i++) {
+			System.out.print(FTE.get(i) + ", ");
+		}
+		System.out.println();
+		//System.out.println("n3: " + n3);
+		System.out.println("teachingCohort: " + teachingCohort);
+		System.out.println("primary: " + primary);
+		
+		for (int i=0; i<availableTime.size(); i++){
+		    int[] tmp = availableTime.get(i);
+		    for (int j=0; j<tmp.length; j++) {
+		         System.out.print(tmp[j] + ", ");
+		    }
+		    System.out.println();
+		}
+		
+		for (int k=0; k< cohortNames.size(); k++) {
+			System.out.print(cohortNames.get(k) + ",");
+		}
+		System.out.println();
+
+		for (int j=0; j< teacherNames.size(); j++) {
+			System.out.print(teacherNames.get(j) + ",");
+		}
+		
 	//define parameters - teachers
 		//Hardcoded values 
 		
@@ -387,9 +419,11 @@ public class version1 {
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
-		int n3 = cohortNames.size() + 2;
+		
         cohortNames.add("Away");
         cohortNames.add("Prep");
+        int n3 = cohortNames.size();
+        System.out.print("what is n3" + n3);
 		//int teachingCohort = n3-2;
 		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
@@ -579,7 +613,7 @@ public class version1 {
 			IloCplex cplex = new IloCplex();
 	
 			//variables
-			
+			System.out.println("x" + n3);
 			//x is the binary location variable
 			IloNumVar [][][][] x = new IloNumVar[n][n2][n3][n4];
 			for(int i = 0;i<n;i++) {
@@ -693,6 +727,9 @@ public class version1 {
 					a[i][j] = cplex.boolVar(varName);
 				}
 			}
+			System.out.println("subj" + subjects);
+			System.out.println("n2" + n2);
+			System.out.println("teachingcohort" + teachingCohort);
 		
 			//define objective
 			IloLinearNumExpr objective = cplex.linearNumExpr();
