@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -13,12 +15,18 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
@@ -34,7 +42,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "Master-Excel-Front-End.xlsx";
+        String excelFilePath = "flamborough_feb6.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -268,6 +276,7 @@ public class version1 {
         	
         	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
         		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
+        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
         	}
 
         	else {
@@ -386,7 +395,7 @@ public class version1 {
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
-		int n3 = cohortNames.size() + 2;
+		int n3 = cohortNames.size();
 		//int teachingCohort = n3-2;
 		int primaryUb = primary;
 		int frenchCohortlb = primaryUb;
@@ -1613,6 +1622,100 @@ if(cplex.solve()) {
 		}
 		
 	}
+	
+
+	//write to excel
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+		 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		 Sheet outputSheet = workbook.createSheet("MasterSchedule" + sdf.format(timestamp));
+		 	    
+	    //headers
+		int teacherStartRow = 2;
+	    Row teacherStart = outputSheet.createRow(teacherStartRow);
+	    teacherStart.createCell(0).setCellValue("Teacher");
+	    
+	    Row periodRow = outputSheet.createRow(1);
+	    periodRow.createCell(1).setCellValue("Period");
+	  	    Row dayRow = outputSheet.createRow(0);
+	    for(int t = 0; t < n4; t++) {
+	   	 periodRow.createCell(t+2).setCellValue(t+1);	 
+	    }
+	    
+	    XSSFFont defaultFont= (XSSFFont) workbook.createFont();
+	    
+	    defaultFont.setFontHeightInPoints((short)10);
+	    defaultFont.setFontName("Arial");
+	    defaultFont.setColor(IndexedColors.BLACK.getIndex());
+	    defaultFont.setBold(false);
+	    defaultFont.setItalic(false);
+
+	    XSSFFont font= (XSSFFont) workbook.createFont();
+	    font.setFontHeightInPoints((short)10);
+	    font.setFontName("Arial");
+	    font.setColor(IndexedColors.BLACK.getIndex());
+	    font.setBold(true);
+	    font.setItalic(false);
+	    
+	    CellStyle cs = workbook.createCellStyle();
+	    cs.setWrapText(true);   
+	    cs.setAlignment(HorizontalAlignment.CENTER);
+	        			        
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,2,7));
+	    Cell day1 = CellUtil.createCell(dayRow, 2, "Day 1");
+	    CellUtil.setAlignment(day1, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day1,font);
+	    	   
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,8,13));
+	    Cell day2 = CellUtil.createCell(dayRow, 8, "Day 2");
+	    CellUtil.setAlignment(day2, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day2,font);
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,14,19));
+	    Cell day3 = CellUtil.createCell(dayRow, 14, "Day 3");
+	    CellUtil.setAlignment(day3, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day3,font);
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,20,25));
+	    Cell day4 = CellUtil.createCell(dayRow, 20, "Day 4");
+	    CellUtil.setAlignment(day4, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day4,font);
+	    
+	    outputSheet.addMergedRegion(new CellRangeAddress(0,0,26,31));
+	    Cell day5 = CellUtil.createCell(dayRow, 26, "Day 5");
+	    CellUtil.setAlignment(day5, HorizontalAlignment.CENTER);
+	    CellUtil.setFont(day5,font); // this should bold it
+		    
+
+	    int periodStartCol = 2;
+	    for(int j =0; j<n2;j++) {
+	    	Row teacherRow = outputSheet.createRow(teacherStartRow + j);
+	    	teacherRow.createCell(1).setCellValue(teacherNames.get(j));
+	    	for(int t =0; t<n4;t++) {
+	    		for(int i =0;i<n;i++) {
+	    			for(int k=0;k<n3;k++) {
+						if((cplex.getValue(x[i][j][k][t])) >0.5) {
+							if(k==n3-1) {
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
+							}
+							else if(k==n3-2) {
+								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
+							}
+							else {
+								Cell cell_style = teacherRow.createCell(periodStartCol+t);
+								cell_style.setCellValue(cohortNames.get(k) + " / " + subj[i]);
+								cell_style.setCellStyle(cs);
+								
+							}
+							
+						}
+	    			}
+	    		}
+	    	}
+	    }
+	    			
+	    
+	    FileOutputStream fileOut = new FileOutputStream(excelFilePath);
+	    workbook.write(fileOut);
 	
 	System.out.println("Prep Time: ");
 	for(int j=0; j< n2; j++) {
