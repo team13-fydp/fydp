@@ -275,7 +275,7 @@ public class version1 {
         	}
         	
         	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
-        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartRow+k).getStringCellValue());
+        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
         		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
         	}
 
