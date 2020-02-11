@@ -275,8 +275,8 @@ public class version1 {
         	}
         	
         	if (inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getCellType() == CellType.STRING) {
-        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
-        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(gradeNameStartCol+k).getStringCellValue());
+        		gradeNames.add(inputSheet2.getRow(gradeNameStartRow).getCell(gradeNameStartRow+k).getStringCellValue());
+        		cohortNames.add(inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol+k).getStringCellValue());
         	}
 
         	else {
@@ -395,6 +395,9 @@ public class version1 {
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
+		cohortNames.add("away");
+		cohortNames.add("prep");
+		
 		int n3 = cohortNames.size();
 		//int teachingCohort = n3-2;
 		int primaryUb = primary;
@@ -403,7 +406,7 @@ public class version1 {
 		int prepCohort = n3-1;
 		int awayCohort = n3-2;
 		
-		//only use these to get the max index of n and n3 to be used for a contraint
+		//only use these to get the max index of n and n3 to be used for a constraint
 		int cohortRange = n3-1;
 		int subjectRange = n-1;
 		
