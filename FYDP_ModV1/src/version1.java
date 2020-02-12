@@ -395,8 +395,8 @@ public class version1 {
 //		String [] teacherNames;
 	
 	//define parameters - cohorts
-		cohortNames.add("away");
-		cohortNames.add("prep");
+		cohortNames.add("Away");
+		cohortNames.add("Prep");
 		
 		int n3 = cohortNames.size();
 		//int teachingCohort = n3-2;
