@@ -1679,11 +1679,7 @@ if(cplex.solve()) {
 	}
 
 	
-    FileOutputStream fileOut = new FileOutputStream(excelFilePath);
-    workbook.write(fileOut);
-
-	
-  //write to excel
+  //write to teacher output to excel 
   		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
   		 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
   		 Sheet outputSheet = workbook.createSheet("MasterSchedule" + sdf.format(timestamp));
@@ -1773,8 +1769,8 @@ if(cplex.solve()) {
   	    }
 
 
-  	    FileOutputStream fileOutComplex = new FileOutputStream(excelFilePath);
-  	    workbook.write(fileOutComplex);
+  	 FileOutputStream fileOut = new FileOutputStream(excelFilePath);
+   	 workbook.write(fileOut);
   	    
 	System.out.println("Prep Time: ");
 	for(int j=0; j< n2; j++) {
