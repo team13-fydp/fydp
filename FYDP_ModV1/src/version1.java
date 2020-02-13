@@ -726,9 +726,9 @@ public class version1 {
 			//objective for slack and surplus weights for even distribution
 			for(int k=0;k<teachingCohort;k++) {
 				for(int d=0;d<numDays;d++) {
-					objective.addTerm(-50, v2[k][d]); //science
-					objective.addTerm(-50, v3[k][d]); //gym
-					objective.addTerm(-50, v4[k][d]); //social studies
+					objective.addTerm(-75, v2[k][d]); //science
+					objective.addTerm(-75, v3[k][d]); //gym
+					objective.addTerm(-75, v4[k][d]); //social studies
 				}
 			}
 						
