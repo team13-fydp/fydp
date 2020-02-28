@@ -42,7 +42,7 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "flamborough_Feb26_testing.xlsx";
+        String excelFilePath = "flamborough_Feb27_testing.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -263,9 +263,6 @@ public class version1 {
 		int numSpecialtyTeach =0;
 		int incr =0;
 		double rating;
-		int specialtyWeight= 10;
-		//int teachingCohort = 0; //number of teaching classes
-		//int primary = 0; //number of primary classes
 		int numCohortsRow = 2;
 		int numPrimaryRow  = 3;
 		int inputColSheet3 = 0;
@@ -305,7 +302,12 @@ public class version1 {
 			for(int k=0; k<teachingCohort; k++) {
 				cellSpecialtyCohort = inputSheet3.getRow(specialtyTeacherStartRow+j).getCell(cohortStartCol+k).getStringCellValue();
 				if(!cellSpecialtyCohort.equals("")) {
-					rewards[k][teacherIndex][subjectIndex] = rating*specialtyWeight;
+					if(rating==1) {
+						rewards[k][teacherIndex][subjectIndex] = 350;
+						
+					}else{
+						rewards[k][teacherIndex][subjectIndex] = 100;
+					}
 				}
 			}
 		}
