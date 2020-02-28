@@ -43,7 +43,7 @@ public class version1 {
 		// write your code here
         //read
 
-        String excelFilePath = "flamborough_Feb27_testing.xlsx";
+        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/java_fypd/fydp/FYDP_ModV1/Master-Excel-Front-End(1) (1).xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -83,7 +83,7 @@ public class version1 {
             int teacher_name_col = 0;
             //fulltime col
             int full_time_col = 3;
-            //teacher allocation row
+            //teacher allocation col
             int teacher_allocation_col = 10;
             //french certification col
             int french_certification_col = 2;
@@ -251,27 +251,12 @@ public class version1 {
 		}
 		//subject type array
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
-	
-
-		for(int rowNum = extraTimeStart; rowNum <= extraTimeEnd; rowNum++) {
-			Row row = sheet.getRow(rowNum);
-			String value = row.getCell(inputColumn).getStringCellValue();
-			
-			for(int i =0; i<subj.length; i++) {
-				if(value.equals(subj[i])) {
-					extraTime[index] = i;
-					index +=1;
-				}
-			}			
-		}
-		
 		//input sheet 2 part 2
 		Sheet inputSheet2 = workbook.getSheetAt(1);
         int cohortNameStartRow = 13; 
         int cohortNameStartCol = 3;
         int subjects = subj.length -2;
         ArrayList<String> cohortNames = new ArrayList<String>(0);
-        double cohortGrade;
         int teachingCohortCountPage2 = 0;
         while (inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol + teachingCohortCountPage2).getStringCellValue() != "") {
         		teachingCohortCountPage2++;
@@ -330,7 +315,7 @@ public class version1 {
 		int numCohortsRow = 2;
 		int numPrimaryRow  = 3;
 		int inputColSheet3 = 0;
-		
+
 		int teachingCohort =  (int)inputSheet3.getRow(numCohortsRow).getCell(inputColSheet3).getNumericCellValue();
 		int primary =  (int)inputSheet3.getRow(numPrimaryRow).getCell(inputColSheet3).getNumericCellValue();
 		
@@ -571,6 +556,7 @@ public class version1 {
 				for(int j=0;j<n2;j++) {
 					for(int k=0;k<teachingCohort;k++) {
 						for(int t=0;t<n4;t++) {
+							
 							objective.addTerm(rewards[k][j][i], x[i][j][k][t]);
 							//objective.addTerm(1, x[i][j][k][t]);
 						}
