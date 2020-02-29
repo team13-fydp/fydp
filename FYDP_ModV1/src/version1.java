@@ -42,7 +42,8 @@ public class version1 {
 	//start of excel read in
 		// write your code here
         //read
-        String excelFilePath = "flamborough_Feb27_testing.xlsx";
+
+        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/java_fypd/fydp/FYDP_ModV1/Master-Excel-Front-End(1) (1).xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -82,35 +83,52 @@ public class version1 {
             int teacher_name_col = 0;
             //fulltime col
             int full_time_col = 3;
-            //teacher allocation row
+            //teacher allocation col
             int teacher_allocation_col = 10;
             //french certification col
             int french_certification_col = 2;
-            //if teacher is the first french teacher
-            boolean first_french = true;
+            //Creating french and english versions of names 
+            ArrayList<String> teacherNames_english = new ArrayList<String>(0);
+            ArrayList<String> teacherNames_french = new ArrayList<String>(0);
+            ArrayList<Double> FTE_english = new ArrayList<Double>(0);
+            ArrayList<Double> FTE_french = new ArrayList<Double>(0);
+            ArrayList<int[]> availableTime_english = new ArrayList<int[]>();
+            ArrayList<int[]> availableTime_french = new ArrayList<int[]>();
 
             
             //interate over two rows at a time 
             int q = teacher_matrix_start; 
             String teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
             
+            boolean isFrenchCertified = false;
             while(teacherName != ""){
             		Row currRow = sheetIndex.getRow(q);
             		boolean fullTime = false;
+            		isFrenchCertified = false;
             		
             		//alternating signal if it is the first row of a teacher
-            	
             		//interate over two rows at a time,
             		//then do a for loop for each two
+            		//Check if each row is a french certified teacher first
+            		String french_test = currRow.getCell(french_certification_col).getStringCellValue();
+            		if(french_test.matches("(.*)x(.*)")) {
+            			isFrenchCertified = true;
+            		}
+            	
+            		
             		int lastColumn =  Math.max(currRow.getLastCellNum(), 10);
             		for (int k = 0; k < lastColumn; k++) {
             			 Cell currCell = currRow.getCell(k);
-            			 
+            		
             			 switch (currCell.getCellType()) {
             			 	case STRING:
             			 		String cell = currCell.getStringCellValue();
             			 		if(k == teacher_name_col) {
-                               	 teacherNames.add(currCell.getStringCellValue());
+            			 			if(isFrenchCertified == true) {
+            			 				teacherNames_french.add(currCell.getStringCellValue());
+            			 			}else{
+            			 				teacherNames_english.add(currCell.getStringCellValue());
+            			 			}
                                 }
             			 		if (k == full_time_col) {
             			 			
@@ -123,16 +141,10 @@ public class version1 {
             			 					fullTimeTeacher[m]=1;
             		
             			 				}
-            			 				availableTime.add(fullTimeTeacher);
-            			 			}
-            			 		}
-            			 		if (k == french_certification_col) {
-            			 			if(cell.matches("(.*)x(.*)")) {
-            			 				if(first_french == true) {
-            			 					//Index of first french teacher 
-            			 					first_french_teacher=teacherNames.size() -1 ;
-            			 					
-            			 					first_french = false;
+            			 				if(isFrenchCertified == true) {
+            			 					availableTime_french.add(fullTimeTeacher);
+            			 				}else {
+            			 					availableTime_english.add(fullTimeTeacher);
             			 				}
             			 			}
             			 		}
@@ -143,10 +155,18 @@ public class version1 {
             			 		FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             			 		CellValue cellValue = evaluator.evaluate(currCell);
             			 		if(k==teacher_allocation_col ) {
-            			 			if(fullTime == false) {
-            			 			FTE.add(currCell.getNumericCellValue()/10);
+            			 			if(fullTime == false) {	
+            			 				if(isFrenchCertified == true) {
+            			 					FTE_french.add(currCell.getNumericCellValue()/10);
+            			 				}else {
+            			 					FTE_english.add(currCell.getNumericCellValue()/10);
+            			 				}
             			 			}else {
-            			 				FTE.add(1.0);
+            			 				if(isFrenchCertified == true) {
+            			 					FTE_french.add(1.0);
+            			 				}else {
+            			 					FTE_english.add(1.0);
+            			 				}
             			 			}
             			 		} 	
             			 }
@@ -171,14 +191,34 @@ public class version1 {
     
             				}
             			}
-            			availableTime.add(allocation_times);
+            			if(isFrenchCertified == true) {
+            				availableTime_french.add(allocation_times);
+            			}else {
+            				availableTime_english.add(allocation_times);
+            			}	
             		}
             		
             		q = q+2;
             		teacherName = sheetIndex.getRow(q).getCell(teacher_name_col).getStringCellValue();
 
             }
+            //index of first french teacher
+            first_french_teacher = teacherNames_english.size();
+           //append separated arraylists together
+            availableTime = availableTime_english;
+            teacherNames = teacherNames_english; 
+            FTE = FTE_english;
+           for(int c = 0; c < availableTime_french.size();c++ ) {
+        	   	availableTime.add(availableTime_french.get(c));
+        	   	teacherNames.add(teacherNames_french.get(c));
+        	   	FTE.add(FTE_french.get(c));
+           }
+           
+           
            n2 = teacherNames.size();
+           //output sorted teacher names with french last
+           //french teach is the number of french teachers
+           //french teach lb is the first index of a french teacher. 
            int frenchTeach = n2 - first_french_teacher;
            int frenchTeachlb = n2 - frenchTeach;
 		
@@ -211,14 +251,12 @@ public class version1 {
 		}
 		//subject type array
 		String [] subj = {"Math", "Language", "Science", "Art", "Social-Studies", "Phys-Ed", "French", "Music", "Drama", "Away", "Prep"};
-
 		//input sheet 2 part 2
 		Sheet inputSheet2 = workbook.getSheetAt(1);
         int cohortNameStartRow = 13; 
         int cohortNameStartCol = 3;
         int subjects = subj.length -2;
         ArrayList<String> cohortNames = new ArrayList<String>(0);
-        double cohortGrade;
         int teachingCohortCountPage2 = 0;
         while (inputSheet2.getRow(cohortNameStartRow).getCell(cohortNameStartCol + teachingCohortCountPage2).getStringCellValue() != "") {
         		teachingCohortCountPage2++;
@@ -233,18 +271,29 @@ public class version1 {
         }
         
         double [][][] rewards = new double [teachingCohortCountPage2][n2][subjects];
+    
         int homeRoomTeacherStartRow = 15; 
         int homeRoomTeacherStartCol = 3;
+        int homeRoomTeacherNameCol = 1;
+
         String cellHomeRoomCohort;
         int homeRoomReward = 300;
         
 		for(int j=0; j<n2; j++){
+			//search for the teacher name. order of index is changed due to french being at the bottom
+			String teacherNameSearch = inputSheet2.getRow(homeRoomTeacherStartRow+j*2).getCell(homeRoomTeacherNameCol).getStringCellValue();
+			int teacherIndex = 0;
+			for(int a=0; a<teacherNames.size(); a++) {
+				if(teacherNameSearch.equals(teacherNames.get(a))) {
+					teacherIndex= a;
+				}
+			}
 			for(int k=0; k<teachingCohortCountPage2; k++) {
 				for(int i=0; i<subjects; i++) {
 					cellHomeRoomCohort = inputSheet2.getRow(homeRoomTeacherStartRow+j).getCell(homeRoomTeacherStartCol+k).getStringCellValue();
 					
 					if (cellHomeRoomCohort != "") {
-					rewards[k][j][i] = homeRoomReward;
+					rewards[k][teacherIndex][i] = homeRoomReward;
 					}
 			
 				}
@@ -266,7 +315,7 @@ public class version1 {
 		int numCohortsRow = 2;
 		int numPrimaryRow  = 3;
 		int inputColSheet3 = 0;
-		
+
 		int teachingCohort =  (int)inputSheet3.getRow(numCohortsRow).getCell(inputColSheet3).getNumericCellValue();
 		int primary =  (int)inputSheet3.getRow(numPrimaryRow).getCell(inputColSheet3).getNumericCellValue();
 		
@@ -507,6 +556,7 @@ public class version1 {
 				for(int j=0;j<n2;j++) {
 					for(int k=0;k<teachingCohort;k++) {
 						for(int t=0;t<n4;t++) {
+							
 							objective.addTerm(rewards[k][j][i], x[i][j][k][t]);
 							//objective.addTerm(1, x[i][j][k][t]);
 						}
