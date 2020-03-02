@@ -43,7 +43,7 @@ public class version1 {
 		// write your code here
         //read
 
-        String excelFilePath = "/Users/mccurdy/Documents/4B/FYPD/java_fypd/fydp/FYDP_ModV1/Master-Excel-Front-End(1) (1).xlsx";
+        String excelFilePath = "OrganizationD.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -281,7 +281,7 @@ public class version1 {
         
 		for(int j=0; j<n2; j++){
 			//search for the teacher name. order of index is changed due to french being at the bottom
-			String teacherNameSearch = inputSheet2.getRow(homeRoomTeacherStartRow+j*2).getCell(homeRoomTeacherNameCol).getStringCellValue();
+			String teacherNameSearch = inputSheet2.getRow(homeRoomTeacherStartRow+j).getCell(homeRoomTeacherNameCol).getStringCellValue();
 			int teacherIndex = 0;
 			for(int a=0; a<teacherNames.size(); a++) {
 				if(teacherNameSearch.equals(teacherNames.get(a))) {
