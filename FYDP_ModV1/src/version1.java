@@ -30,6 +30,7 @@ import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.ss.usermodel.FillPatternType;  
 
 public class version1 {
 
@@ -43,7 +44,7 @@ public class version1 {
 		// write your code here
         //read
 
-        String excelFilePath = "OrganizationD.xlsx";
+        String excelFilePath = "orgA_1920_new_input.xlsx";
         FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
         Workbook workbook = new XSSFWorkbook(inputStream);
         int numberOfSheets = workbook.getNumberOfSheets();
@@ -361,6 +362,27 @@ public class version1 {
 			}
 		}
 		
+		//test
+	/*	CellStyle cs1 = workbook.createCellStyle();
+		Sheet testSheet = workbook.createSheet("test3She3e2t");  
+	  	Row rowTest = testSheet.createRow(1);
+	  	Cell cell = rowTest.createCell(1); 
+	  	cs1.setFillForegroundColor(IndexedColors.fromInt(49).getIndex());  
+	  	cs1.setFillPattern(FillPatternType.SOLID_FOREGROUND);  
+	  	cell.setCellStyle(cs1);
+	  	cell.setCellValue("fhshfksf");
+
+	  	teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));    
+	  	FileOutputStream fileOut = new FileOutputStream(excelFilePath);
+	    workbook.write(fileOut);*/
+	    
+	    int startColour = 40;
+	    int cohortColours[] = new int [cohortNames.size()];
+	    for(int i=0; i<cohortColours.length; i++) {
+	    	cohortColours[i] = startColour+i;
+	    }
+	    
+
 	 //start of model
 	 //define parameters - subjects
 		int n = subj.length;	
@@ -1474,6 +1496,8 @@ if(cplex.solve()) {
 		
 	}
 	
+	
+	
 	//output to Excel - simple master list printout
 	Sheet Outsheet = workbook.getSheetAt(3);
 	
@@ -1582,7 +1606,16 @@ if(cplex.solve()) {
   	    CellUtil.setAlignment(day5, HorizontalAlignment.CENTER);
   	    CellUtil.setFont(day5,font); // this should bold it
 
-
+	
+  	  /*CellStyle cs1 = workbook.createCellStyle();
+		Sheet testSheet = workbook.createSheet("test3She3e2t");  
+	  	Row rowTest = testSheet.createRow(1);
+	  	Cell cell = rowTest.createCell(1); 
+	  	cs1.setFillForegroundColor(IndexedColors.fromInt(49).getIndex());  
+	  	cs1.setFillPattern(FillPatternType.SOLID_FOREGROUND);  
+	  	cell.setCellStyle(cs1);
+	  	cell.setCellValue("fhshfksf");*/
+  	  
   	    int periodStartCol = 2;
   	    for(int j =0; j<n2;j++) {
   	    	Row teacherRow = outputSheet.createRow(teacherStartRow + j);
@@ -1598,9 +1631,17 @@ if(cplex.solve()) {
   								teacherRow.createCell(periodStartCol+t).setCellValue(cohortNames.get(k));
   							}
   							else {
+
+  						  	    
   								Cell cell_style = teacherRow.createCell(periodStartCol+t);
   								cell_style.setCellValue(cohortNames.get(k) + " / " + subj[i]);
-  								cell_style.setCellStyle(cs);
+  								cs.setFillForegroundColor(IndexedColors.fromInt(cohortColours[k]).getIndex()); 
+  								cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+  								
+  								
+  						  	    CellStyle csTest = workbook.createCellStyle();
+  						  	    csTest.cloneStyleFrom(cs);
+  								cell_style.setCellStyle(csTest);
 
   							}
 
