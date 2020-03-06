@@ -40,7 +40,7 @@ public class version1 {
 
 	public static void modelConfig() throws IOException {
 		// read in input data from Excel
-		String excelFilePath = "orgA_1920_new_input.xlsx";
+		String excelFilePath = "orgA_1920_new_input_output.xlsx";
 		FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 		Workbook workbook = new XSSFWorkbook(inputStream);
 
@@ -56,7 +56,6 @@ public class version1 {
 
 		// Individual teacher allocation time
 		ArrayList<int[]> availableTime = new ArrayList<int[]>();
-		// number of french teachers
 		// index of first french teacher
 		int first_french_teacher = -1;
 
@@ -365,8 +364,15 @@ public class version1 {
 		// assign colours to cohorts
 		int startColour = 40;
 		int cohortColours[] = new int[cohortNames.size()];
-		for (int i = 0; i < cohortColours.length; i++) {
-			cohortColours[i] = startColour + i;
+		cohortColours[0] = 26;
+		cohortColours[1] = 31;
+		for (int i = 0; i < cohortColours.length-2; i++) {
+			if(startColour+i >= 48) {
+				cohortColours[i+2] = startColour + i + 1;
+			}
+			else {
+				cohortColours[i+2] = startColour + i;
+			}
 		}
 
 		// define additional parameters
@@ -1376,7 +1382,7 @@ public class version1 {
 
 			cplex.exportModel("lpex1.lp");
 			//tolerance
-			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 5e-2);
+			cplex.setParam(IloCplex.Param.MIP.Tolerances.MIPGap, 2e-2);
 
 			if (cplex.solve()) {
 
@@ -1502,7 +1508,7 @@ public class version1 {
 						}
 					}
 				}
-
+ 
 				// second output sheet
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -1512,12 +1518,24 @@ public class version1 {
 				int teacherStartRow = 2;
 				Row teacherStart = outputSheet.createRow(teacherStartRow);
 				teacherStart.createCell(0).setCellValue("Teacher");
-
+				int day = 0;
 				Row periodRow = outputSheet.createRow(1);
 				periodRow.createCell(1).setCellValue("Period");
 				Row dayRow = outputSheet.createRow(0);
 				for (int t = 0; t < n4; t++) {
-					periodRow.createCell(t + 2).setCellValue(t + 1);
+					if(t>=6 && t<12) {
+						day=1;
+					}
+					else if(t>=12 && t<18) {
+						day=2;
+					}
+					else if(t>=18 && t<24) {
+						day=3;
+					}
+					else if(t>=24 && t<30) {
+						day=4;
+					}
+					periodRow.createCell(t + 2).setCellValue((t + 1)-6*day);
 				}
 
 				XSSFFont defaultFont = (XSSFFont) workbook.createFont();
@@ -1563,7 +1581,7 @@ public class version1 {
 				Cell day5 = CellUtil.createCell(dayRow, 26, "Day 5");
 				CellUtil.setAlignment(day5, HorizontalAlignment.CENTER);
 				CellUtil.setFont(day5, font); // this should bold it
-
+				
 				int periodStartCol = 2;
 				for (int j = 0; j < n2; j++) {
 					Row teacherRow = outputSheet.createRow(teacherStartRow + j);
@@ -1579,7 +1597,7 @@ public class version1 {
 									} else {
 
 										Cell cell_style = teacherRow.createCell(periodStartCol + t);
-										cell_style.setCellValue(cohortNames.get(k) + " / " + subj[i]);
+										cell_style.setCellValue(cohortNames.get(k) + " - " + subj[i]);
 										cs.setFillForegroundColor(IndexedColors.fromInt(cohortColours[k]).getIndex());
 										cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
