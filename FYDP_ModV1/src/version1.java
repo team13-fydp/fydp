@@ -1624,9 +1624,9 @@ public class version1 {
 				}
 
 				//output sheet for each cohort
-				String sheetNames [] = new String[n3-2];
+				String sheetNames [] = new String[teachingCohort];
 				
-				for(int k=0;k<n3-2;k++) {
+				for(int k=0;k<teachingCohort;k++) {
 					if(cohortNames.get(k).contains("/")) {
 						sheetNames[k] = cohortNames.get(k).replace("/", "-");
 					}else if(cohortNames.get(k).contains("\\")) {
