@@ -40,7 +40,7 @@ public class version1 {
 
 	public static void modelConfig() throws IOException {
 		// read in input data from Excel
-		String excelFilePath = "orgA_1920_new_input_output.xlsx";
+		String excelFilePath = "orgA_1920_new_input.xlsx";
 		FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 		Workbook workbook = new XSSFWorkbook(inputStream);
 
@@ -364,6 +364,9 @@ public class version1 {
 		// assign colours to cohorts
 		int startColour = 40;
 		int cohortColours[] = new int[cohortNames.size()];
+		int teacherColours[] = new int[teacherNames.size()];
+		teacherColours[0]=26;
+		teacherColours[1]=31;
 		cohortColours[0] = 26;
 		cohortColours[1] = 31;
 		for (int i = 0; i < cohortColours.length-2; i++) {
@@ -372,6 +375,15 @@ public class version1 {
 			}
 			else {
 				cohortColours[i+2] = startColour + i;
+			}
+		}
+		
+		for (int i = 0; i < teacherColours.length-2; i++) {
+			if(startColour+i >= 48) {
+				teacherColours[i+2] = startColour + i + 1;
+			}
+			else {
+				teacherColours[i+2] = startColour + i;
 			}
 		}
 
@@ -1611,6 +1623,142 @@ public class version1 {
 					}
 				}
 
+				//output sheet for each cohort
+				String sheetNames [] = new String[teachingCohort];
+				
+				for(int k=0;k<teachingCohort;k++) {
+					if(cohortNames.get(k).contains("/")) {
+						sheetNames[k] = cohortNames.get(k).replace("/", "-");
+					}else if(cohortNames.get(k).contains("\\")) {
+						sheetNames[k] = cohortNames.get(k).replace("\\", "-");
+					}else {
+						sheetNames[k] = cohortNames.get(k);
+					}
+					
+				}
+				for(int k=0; k<sheetNames.length;k++) {
+					Sheet cohortOutput = workbook.createSheet(sheetNames[k]);
+					
+					int counter = 0;
+					Row beginRow1 = cohortOutput.createRow(0);
+					Row periodRowS1 = cohortOutput.createRow(1);
+					Row periodRowS2 = cohortOutput.createRow(2);
+					Row periodRowS3 = cohortOutput.createRow(3);
+					Row periodRowS4 = cohortOutput.createRow(4);
+					Row periodRowS5 = cohortOutput.createRow(5);
+					Row periodRowS6 = cohortOutput.createRow(6);
+									
+					for(int d=1;d<6;d++) {
+											
+						beginRow1.createCell(d).setCellValue("Day "+d);
+						System.out.println("Day "+d);
+					}
+
+					periodRowS1.createCell(0).setCellValue(1);
+					periodRowS2.createCell(0).setCellValue(2);
+					periodRowS3.createCell(0).setCellValue(3);
+					periodRowS4.createCell(0).setCellValue(4);
+					periodRowS5.createCell(0).setCellValue(5);
+					periodRowS6.createCell(0).setCellValue(6);
+
+					for (int t = 0; t < n4; t++) {
+						int cohortDay=1;
+						
+						if(t>=6 && t<12) {
+							cohortDay =2;
+						}else if(t>=12 && t<18) {
+							cohortDay=3;
+						}else if(t>=18 && t<24) {
+							cohortDay=4;
+						}else if(t>=24 && t<30) {
+							cohortDay=5;
+						}
+						
+						
+						for (int i = 0; i < n; i++) {
+							for (int j = 0; j < n2; j++) {
+									if ((cplex.getValue(x[i][j][k][t])) > 0.5) {									
+										if (t == 0 || t == 6 || t == 12 || t == 18 || t == 24) {
+											
+											Cell cell_style = periodRowS1.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+											
+										} else if (t == 1 || t == 7 || t == 13 || t == 19 || t == 25) {
+	
+											Cell cell_style = periodRowS2.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+											
+										} else if (t == 2 || t == 8 || t == 14 || t == 20 || t == 26) {
+											
+											Cell cell_style = periodRowS3.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+											
+										} else if (t == 3 || t == 9 || t == 15 || t == 21 || t == 27) {
+											
+											Cell cell_style = periodRowS4.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+											
+										} else if(t == 4 || t == 10 || t == 16 || t == 22 || t == 28) {
+										
+											Cell cell_style = periodRowS5.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));	
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+											
+										} else {
+											
+											Cell cell_style = periodRowS6.createCell(cohortDay);
+											cell_style.setCellValue(subj[i] + " - " + teacherNames.get(j));
+											
+											cs.setFillForegroundColor(IndexedColors.fromInt(teacherColours[j]).getIndex());
+											cs.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+											CellStyle csColour = workbook.createCellStyle();
+											csColour.cloneStyleFrom(cs);
+											cell_style.setCellStyle(csColour);
+										
+										}
+									}
+								}
+							}						
+					}			
+
+			}
+				
+				
 				FileOutputStream fileOut = new FileOutputStream(excelFilePath);
 				workbook.write(fileOut);
 
